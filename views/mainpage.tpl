@@ -11,7 +11,10 @@
 <table border=1>
 <tr>
 <th>№</th><th>IP</th><th>Hostname<br/>по DNS</th>
-<th>Последнее обновление<br/>(GMT)</th><th>Время<br/>с последнего обновления<br/>минут</th><th>Статус</th><th>Пользователи<br/>(за 10 минут)</th>
+<th>Последнее обновление<br/>(GMT)</th><th>Время<br/>с последнего обновления<br/>минут</th>
+<th>Статус</th><th>Пользователи<br/>(за 10 минут)</th>
+<th>Включен<br/>за месяц<br/>минут</th><th>Использовался<br/>за месяц<br/>минут</th>
+<th>Процент<br/> использования</th>
 </tr>
 %online = 0
 %for i in value["values"]:
@@ -37,9 +40,18 @@
 {{userslog[i[1]]}}
 %end
 </td>
+<td>
+{{i[5]}}
+</td>
+<td>
+{{i[6]}}
+</td>
+<td>
+{{100.0*i[6]/i[5]}} %
+</td>
 </tr>
 %end
-<tr><td colspan=7><hr/></td></tr>
+<tr><td colspan=10><hr/></td></tr>
 <tr><td colspan=2></td><td>Всего:</td><td>{{value["total"]}}</td><td>Включено:</td><td>{{online}}</td></tr>
 </table>
 %end
