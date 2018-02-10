@@ -7,4 +7,7 @@ CREATE TABLE users (id integer primary key autoincrement not null, ip text not n
 CREATE TABLE network (id integer primary key autoincrement not null, ip text not null, time datetime not null, netspeed integer);
 CREATE TABLE load (id integer primary key autoincrement not null, ip text not null, time datetime not null, cpuload real not null, loadavg real not null, cores integer not null);
 CREATE TABLE diskspace (id integer primary key autoincrement not null, ip text not null, time datetime not null, volume text not null, free real not null, total real not null);
+CREATE UNIQUE INDEX hostnames_index on hostnames(ip, time);
+CREATE INDEX load_index1 on load(ip, time);
+CREATE INDEX users_index1 on users(ip, time);
 COMMIT;
