@@ -9,3 +9,7 @@ sqlite3 database.sqlite3 "update machines set room='a445' where hostname like 'a
 ```
 
 After registering other machines
+
+#TODO
+This needs refactoring. BADLY.
+
