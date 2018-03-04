@@ -13,6 +13,8 @@ from my_db import db_exec_sql
 
 @route('/graph.js')
 def graphjs():
+        isgroup=request.query.getunicode("isgroup",False)
+	attribute=request.query.getunicode("attribute","_")
 	text = """
 if(typeof(jarmon) === 'undefined') {
         var jarmon = {};
@@ -172,17 +174,12 @@ def acceptdata():
 	reportedhostname=request.json['hostname']
 	uptime=request.json['uptime']
 	users=request.json['users']
-	netspeed=request.json['netspeed']
 	cpu=request.json['cpu']
-	disks=request.json['disks']
 	db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip, reportedhostname))
 	db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip, uptime))
 	for i in users:
 		db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip, i))
-	db_exec_sql("insert into network (ip, time, netspeed) values ( ?, DATETIME('now'), ?)", (ip, netspeed))
 	db_exec_sql("insert into load (ip, time, cpuload, loadavg, cores) values ( ?, DATETIME('now'), ?, ?, ?)", (ip, cpu['load'], cpu['loadavg'],cpu['cores']))
-	for i in disks:
-		db_exec_sql("insert into diskspace (ip, time, volume, free, total) values ( ?, DATETIME('now'), ?, ?, ?)", (ip, i['volume'], i['free'], i['total']))
 	return dict()
 
 bottle.run(server=bottle.CGIServer)
