@@ -58,11 +58,10 @@ def getansible(hostname):
 
 def putansible(hostname,ok,change,unreachable,failed):
 	#CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
-	result = db_exec_sql("insert or update select time, ok, change, unreachable, failed from ansible where (hostname = ?) ", (hostname,))
 	res = db_exec_sql("select id from ansible where hostname = ?", (hostname,))
 	if len(res) == 0:
 		t = (hostname, ok, change, unreachable, failed, )
-		result = db_exec_sql("insert into ansbile ( hostname, ok, change, unreachable, failed, time ) values ( ?, ?, ?, ?, ?, (DATETIME('now')))", t)
+		result = db_exec_sql("insert into ansible ( hostname, ok, change, unreachable, failed, time ) values ( ?, ?, ?, ?, ?, (DATETIME('now')))", t)
 	else:
 		t = (ok, change, unreachable, failed, hostname)
 		result = db_exec_sql("update ansible set ok = ?, change= ?, unreachable = ?, failed = ?, time = (DATETIME('now')) where hostname = ?", t)
@@ -183,8 +182,6 @@ def acceptansibledata():
 	hostname = request.environ.get("REMOTE_HOST")
 	if hostname == None:
 	    hostname = socket.gethostbyaddr(ip)[0]
-	t = (ip, )
-	reportedhostname=request.json['hostname']
 	#CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
 	ok = request.json['ok']
 	change = request.json['change']

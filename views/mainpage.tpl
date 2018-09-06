@@ -25,7 +25,8 @@
 <td><a href=./computer/{{i[2]}}>{{i[1]}}</a></td>
 <td>{{i[2]}}</td>
 <td>{{i[3]}}</td>
-<td align=right>{{int(i[4]*1.0)}}</td>
+%import datetime
+<td align=right>{{str(datetime.timedelta(seconds=int(i[4]*60.0)))}}</td>
 <td>
 %if i[4] < 5:
 <font color="green">Online</font>
@@ -58,10 +59,12 @@
 </td>
 <td>
 %if i[7]:
-{{i[7][0]}}/
-{{i[7][1]}}/
-{{i[7][2]}}/
-{{i[7][3]}}
+{{i[7][0]}}
+<font color="green">{{i[7][1]}}</font>
+/
+<font color="orange">{{i[7][2]}}</font>/
+<font color="black">{{i[7][3]}}</font>/
+<font color="red">{{i[7][4]}}</font>
 %else:
 N/A
 %end
