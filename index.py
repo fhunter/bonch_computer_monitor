@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding=utf-8
+import settings
 import datetime
 import bottle
 import socket
@@ -47,11 +48,30 @@ def getusage(period,ip):
 	result = db_exec_sql("select count() from users where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
 	return result[0][0]*5
 
+def getansible(hostname):
+	#CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
+	result = db_exec_sql("select time, ok, change, unreachable, failed from ansible where (hostname = ?) ", (hostname,))
+	if len(result)==0:
+	    return None
+	else:
+	    return result[0]
+
+def putansible(hostname,ok,change,unreachable,failed):
+	#CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
+	result = db_exec_sql("insert or update select time, ok, change, unreachable, failed from ansible where (hostname = ?) ", (hostname,))
+	res = db_exec_sql("select id from ansible where hostname = ?", (hostname,))
+	if len(res) == 0:
+		t = (hostname, ok, change, unreachable, failed, )
+		result = db_exec_sql("insert into ansbile ( hostname, ok, change, unreachable, failed, time ) values ( ?, ?, ?, ?, ?, (DATETIME('now')))", t)
+	else:
+		t = (ok, change, unreachable, failed, hostname)
+		result = db_exec_sql("update ansible set ok = ?, change= ?, unreachable = ?, failed = ?, time = (DATETIME('now')) where hostname = ?", t)
+
+
 def getpowered(period,ip):
 	""" Время во включенном состоянии компьютера за определённый период  period - в днях"""
 	result = db_exec_sql("select count() from load where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
 	return result[0][0]*5
-
 
 @route('/')
 @view('mainpage')
@@ -81,7 +101,8 @@ def main():
 	    	 result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
 	    temp = []
 	    for record in result:
-		temptuple = record + (getpowered(30,record[1]),getusage(30,record[1]),)
+		ansible = getansible(record[2])
+		temptuple = record + (getpowered(30,record[1]),getusage(30,record[1]),ansible)
 		temp.append(temptuple)
 	    displaydata[i]['values']=temp
 	    displaydata[i]['total']=len(result)
@@ -155,6 +176,23 @@ def machinestats(grp):
         tabs=json.dumps(tabs)
         recipes=json.dumps(recipes)
 	return dict(date=datetime.datetime.now(),hosts=result,popularity=popularity,tabs=tabs,recipes=recipes,attr=grp,group=True)
+
+@route('/api/ansible',method='POST')
+def acceptansibledata():
+	ip = request.environ.get("REMOTE_ADDR")
+	hostname = request.environ.get("REMOTE_HOST")
+	if hostname == None:
+	    hostname = socket.gethostbyaddr(ip)[0]
+	t = (ip, )
+	reportedhostname=request.json['hostname']
+	#CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
+	ok = request.json['ok']
+	change = request.json['change']
+	unreachable = request.json['unreachable']
+	failed = request.json['unreachable']
+	putansible(hostname, ok, change, unreachable, failed)
+	return dict()
+	
 
 @route('/api/data',method='POST')
 def acceptdata():
