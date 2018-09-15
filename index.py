@@ -186,7 +186,7 @@ def acceptansibledata():
 	ok = request.json['ok']
 	change = request.json['change']
 	unreachable = request.json['unreachable']
-	failed = request.json['unreachable']
+	failed = request.json['failed']
 	putansible(hostname, ok, change, unreachable, failed)
 	return dict()
 	
