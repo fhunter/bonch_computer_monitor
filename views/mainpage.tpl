@@ -11,12 +11,16 @@
 <h2><a href="./group/{{value['link']}}">{{value['name']}}</a></h2>
 <table border=1>
 <tr>
-<th>№</th><th>IP</th><th>Hostname<br/>по DNS</th>
-<th>Последнее обновление<br/>(GMT)</th><th>Время<br/>с последнего<br/> обновления<br/>минут</th>
-<th>Статус</th><th>Пользователи<br/>(за 10 минут)</th>
-<th>Включен<br/>за месяц<br/>минут</th><th>Использовался<br/>за месяц<br/>минут</th>
-<th>Процент<br/> использования</th>
-<th>Отчёт<br/>Ansible</th>
+<th rowspan=2>№</th><th rowspan=2>IP</th><th rowspan=2>Hostname<br/>по DNS</th>
+<th rowspan=2>Последнее обновление<br/>(GMT)</th><th rowspan=2>С последнего<br/> обновления<br/>чч:мм:сс</th>
+<th rowspan=2>Статус</th><th rowspan=2>Пользователи<br/>(за 10 минут)</th>
+<th colspan=3>Использование за месяц<br/> часов:минут:секунд</th>
+<th rowspan=2>Отчёт<br/>Ansible</th>
+</tr>
+<tr>
+<th>Включён</th>
+<th>Использовался</th>
+<th>%</th>
 </tr>
 %online = 0
 %for i in value["values"]:
@@ -44,10 +48,10 @@
 %end
 </td>
 <td align=right>
-{{i[5]}}
+{{str(datetime.timedelta(minutes=i[5]))}}
 </td>
 <td align=right>
-{{i[6]}}
+{{str(datetime.timedelta(minutes=i[6]))}}
 </td>
 <td align=right>
 %if i[5] == 0:
