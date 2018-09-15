@@ -50,7 +50,7 @@ def getusage(period,ip):
 
 def getansible(hostname):
 	#CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
-	result = db_exec_sql("select time, ok, change, unreachable, failed from ansible where (hostname = ?) ", (hostname,))
+	result = db_exec_sql("select (julianday('now') - julianday(time)), ok, change, unreachable, failed from ansible where (hostname = ?) ", (hostname,))
 	if len(result)==0:
 	    return None
 	else:

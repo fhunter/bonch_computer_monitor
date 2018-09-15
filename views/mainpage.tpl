@@ -63,12 +63,12 @@
 </td>
 <td>
 %if i[7]:
-{{i[7][0]}}
 <font color="green">{{i[7][1]}}</font>
 /
 <font color="orange">{{i[7][2]}}</font>/
 <font color="black">{{i[7][3]}}</font>/
-<font color="red">{{i[7][4]}}</font>
+<font color="red">{{i[7][4]}}</font>&nbsp
+{{str(datetime.timedelta(seconds=int(i[7][0]*24*60*60)))}} 
 %else:
 N/A
 %end
