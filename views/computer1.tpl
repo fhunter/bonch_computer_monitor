@@ -11,7 +11,7 @@
 </tr>
 <tr>
 %for x in xrange(0,24):
-<th width=3.75% colspan=12>{{x}}</th>
+<th width=3.75% colspan=12>{{(x+3)%24}}</th>
 %end
 </tr>
 </thead>
@@ -23,14 +23,11 @@
 %if j in uptime:
 	%if j in users:
 	<td bgcolor=green>
-	&nbsp;
 	%else:
 	<td bgcolor=lime>
-	&nbsp;
 	%end
 %else:
 <td>
-&nbsp;
 %end
 </td>
 %end
