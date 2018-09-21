@@ -59,6 +59,9 @@
 <th rowspan=2>Компьютер</th><th colspan=4>Пользователи</th>
 </tr>
 <tr>
+%def myfunc(e):
+%return e[1]
+%end
 %for i in [7,14,30,60,90,180]:
 <th>{{i}} дней</th>
 %end
@@ -77,6 +80,7 @@
 	<th>Пользователь</th><th>минуты</th>
 	<tr>
 	</thead>
+	%popularity[i[0]][j].sort(reverse=True,key=myfunc)
 	%for k in popularity[i[0]][j]:
 	<tr>
 	<td>{{k[0]}}</td><td>{{k[1]}}</td>
