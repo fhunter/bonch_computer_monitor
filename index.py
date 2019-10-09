@@ -101,26 +101,6 @@ def machinestats(machine):
 	    popularity[j]=usage.getpopularity(j,ip)
 	return dict(date=datetime.datetime.now(),machine=result,popularity=popularity,attr=machine,group=False)
 
-def getrrds(host, target):
-	retval = []
-	if target == "cpu":
-    	    #        ['data/a43908.dcti.sut.ru/df-tmp/df_complex-free.rrd','0','df_complex-free.rrd','unit', ],
-	    files = glob.glob("/var/www/rrds/"+host+"/cpu-[0-9]/cpu-*.rrd")
-	    for i in files:
-		path = re.sub("^/var/www","",i)
-	        tempval = [path,"0",path,"%"]
-	        retval.append(tempval)
-	elif target == "memory":
-	    pass
-	elif target == "load":
-	    pass
-	elif target == "users":
-	    pass
-	elif target == "uptime":
-	    pass
-	else:
-	    pass
-	return retval
 
 @route('/group/<grp>')
 @view('group')
@@ -147,8 +127,6 @@ def machinestats(grp):
 			temp2.append(recipe_name)
 			recipes[recipe_name]= { }
 			recipes[recipe_name]["title"]=j+" on " + i[0]
-			recipes[recipe_name]["data"]=getrrds(i[0],j)
-			recipes[recipe_name]["options"]="jQuery.extend(true, {}, jarmon.Chart.BASE_OPTIONS, jarmon.Chart.STACKED_OPTIONS)"
 		temp.append(temp2)
 		tabs.append(temp)
         tabs=json.dumps(tabs)
