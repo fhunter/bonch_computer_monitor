@@ -3,7 +3,7 @@
 %import calendar
 %import datetime
 %import usage
-<table border=0 width=75%>
+<table border=1 width=75%>
 <thead>
 <tr >
 <th rowspan=2 width=10%>Дата</th>
@@ -11,26 +11,14 @@
 </tr>
 <tr>
 %for x in xrange(0,24):
-<th width=3.75% colspan=12>{{(x+3)%24}}</th>
+<th width=3.75% >{{(x+3)%24}}</th>
 %end
 </tr>
 </thead>
 %today = datetime.datetime.today()
 %for i in calendar.Calendar().itermonthdates(today.year,today.month):
 <tr><td>{{i}}</td>
-%users, uptime = usage.getdetailedusage(i, ip)
-%for j in xrange(0,288):
-%if j in uptime:
-	%if j in users:
-	<td bgcolor=green>
-	%else:
-	<td bgcolor=lime>
-	%end
-%else:
-<td>
-%end
-</td>
-%end
+<td colspan=24><img src="../image/{{ip}}/{{i}}" width=100% ></td>
 </tr>
 %end
 </table>

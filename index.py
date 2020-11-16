@@ -12,29 +12,9 @@ from bottle import route, view, request, template, static_file, response, abort,
 from my_db import db_exec_sql
 import usage
 import ansiblestats
+from PIL import Image
+import StringIO
 
-
-@route('/graph.js')
-def graphjs():
-        isgroup=request.query.getunicode("isgroup",False)
-	attribute=request.query.getunicode("attribute","_")
-	text = """
-if(typeof(jarmon) === 'undefined') {
-        var jarmon = {};
-}
-"""
-	text = text + """
-jarmon.TAB_RECIPES_STANDARD = [
-	['Система',	['cpu','memory','load']],
-	['Сеть',	['interface']],
-	['Диски',	[]],
-	['Нагрузка',	['users','load']],
-]
-
-jarmon.CHART_RECIPES_COLLECTD = {
-}
-"""
-	return text
 
 @route('/')
 @view('mainpage')
@@ -46,7 +26,7 @@ def main():
 	for i in usersloggedin:
 	    if i[0] in userslog:
 		temp=userslog[i[0]]
-		userslog[i[0]]= temp + "," + i[1]
+		userslog[i[0]]= temp + " " + i[1]
 	    else:
 		userslog[i[0]]= i[1]
 	onlinecount=online[0][0]
@@ -85,6 +65,30 @@ def machinestats(machine):
 	for j in [7,14,30,60,90,180]:
 	    popularity[j]=usage.getpopularity(j,ip)
 	return dict(date=datetime.datetime.now(),machine=result,popularity=popularity,ip= ip,attr=machine,group=False)
+
+@route('/image/<machine>/<date>')
+def machinestats_image(machine, date):
+	image = Image.new('RGB',(288,3))
+	users, uptime = usage.getdetailedusage(date, machine)
+	for j in xrange(0,288):
+	    if j in uptime:
+	        if j in users:
+		    pass
+		    image.putpixel((j,0),(0,128,0))
+		    image.putpixel((j,1),(0,128,0))
+	            #<td bgcolor=green>
+	        else:
+		    image.putpixel((j,0),(0,255,0))
+		    image.putpixel((j,1),(0,255,0))
+	            #<td bgcolor=lime>
+	    else:
+	       image.putpixel((j,0),(255,255,255))
+	       image.putpixel((j,1),(255,255,255))
+	        #<td>
+
+	image_file = StringIO.StringIO()
+	image.save(image_file, "PNG")
+	return image_file.getvalue()
 
 @route('/computer/<machine>')
 @view('computer')
