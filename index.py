@@ -12,6 +12,7 @@ from bottle import route, view, request, template, static_file, response, abort,
 from my_db import db_exec_sql
 import usage
 import ansiblestats
+import scratchstats
 from PIL import Image
 import StringIO
 
@@ -45,7 +46,8 @@ def main():
 	    temp = []
 	    for record in result:
 		ansible = ansiblestats.getansible(record[2])
-		temptuple = record + (usage.getpowered(30,record[1]),usage.getusage(30,record[1]),ansible)
+		scratch = scratchstats.getscratch(record[2]) # time, full, free
+		temptuple = record + (usage.getpowered(30,record[1]),usage.getusage(30,record[1]),ansible,scratch,'NaN')
 		temp.append(temptuple)
 	    displaydata[i]['values']=temp
 	    displaydata[i]['total']=len(result)
@@ -149,6 +151,17 @@ def acceptansibledata():
 	unreachable = request.json['unreachable']
 	failed = request.json['failed']
 	ansiblestats.putansible(hostname, ok, change, unreachable, failed)
+	return dict()
+
+@route('/api/scratch',method='POST')
+def acceptscratchdata():
+	ip = request.environ.get("REMOTE_ADDR")
+	hostname = request.environ.get("REMOTE_HOST")
+	if hostname == None:
+	    hostname = socket.gethostbyaddr(ip)[0]
+	scratch_free = request.json['scratch_free']
+	scratch_total = request.json['scratch_total']
+	scratchstats.putscratch(hostname, scratch_total, scratch_free)
 	return dict()
 	
 

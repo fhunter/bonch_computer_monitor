@@ -15,6 +15,8 @@
 <th rowspan=2>Последнее обновление<br/>(GMT)</th><th rowspan=2>С последнего<br/> обновления<br/>чч:мм:сс</th>
 <th rowspan=2>Статус</th><th rowspan=2>Пользователи<br/>(за 10 минут)</th>
 <th colspan=3>Использование за месяц<br/> часов:минут:секунд</th>
+<th rowspan=2> Место на scratch </th>
+<th rowspan=2> Статус батареи CMOS </th>
 <th rowspan=2>Отчёт<br/>Ansible</th>
 </tr>
 <tr>
@@ -61,6 +63,16 @@
 {{int(100.0*i[6]/i[5])}} %
 %end
 </td>
+%if i[8]:
+<td>{{int(i[8][2]/(1024*1024*1024))}}/{{int(i[8][1]/(1024*1024*1024))}} Гб</td>
+%else:
+<td>N/A</td>
+%end
+%if i[9]:
+<td>{{i[9]}}</td>
+%else:
+<td>N/A</td>
+%end
 <td>
 %if i[7]:
 <font color="green">{{i[7][1]}}</font>
@@ -78,7 +90,7 @@ N/A
 </td>
 </tr>
 %end
-<tr><td colspan=11><hr/></td></tr>
+<tr><td colspan=13><hr/></td></tr>
 <tr><td colspan=2></td><td>Всего:</td><td>{{value["total"]}}</td><td>Включено:</td><td>{{online}}</td></tr>
 </table>
 %end
