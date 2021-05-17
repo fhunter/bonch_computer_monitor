@@ -16,7 +16,30 @@ import scratchstats
 from PIL import Image
 import StringIO
 
+from bottle import HTTPError
+from bottle.ext import sqlalchemy
+from sqlalchemy import create_engine, Column, Integer, Sequence, String
+from sqlalchemy.types import DateTime, Date, Boolean
+from sqlalchemy.ext.declarative import declarative_base
 
+#Base = declarative_base()
+#engine = create_engine('sqlite:///test.db', echo=False)
+#
+#app = bottle.Bottle()
+#plugin = sqlalchemy.Plugin(
+#    engine, # SQLAlchemy engine created with create_engine function.
+#    Base.metadata, # SQLAlchemy metadata, required only if create=True.
+#    keyword='db', # Keyword used to inject session database in a route (default 'db').
+#    create=True, # If it is true, execute `metadata.create_all(engine)` when plugin is applied (default False).
+#    commit=True, # If it is true, plugin commit changes after route is executed (default True).
+#    use_kwargs=False # If it is true and keyword is not defined, plugin uses **kwargs argument to inject session database (default False).
+#)
+#
+#app.install(plugin)
+
+
+
+#@app.get('/',sqlalchemy=dict(use_kwargs=True))
 @route('/')
 @view('mainpage')
 def main():
@@ -192,4 +215,5 @@ def acceptdata():
 	return dict()
 
 bottle.run(server=bottle.CGIServer)
+#app.run(server=bottle.CGIServer)
 
