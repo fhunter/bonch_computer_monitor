@@ -22,24 +22,12 @@ from sqlalchemy import create_engine, Column, Integer, Sequence, String
 from sqlalchemy.types import DateTime, Date, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
-#Base = declarative_base()
-#engine = create_engine('sqlite:///test.db', echo=False)
-#
-#app = bottle.Bottle()
-#plugin = sqlalchemy.Plugin(
-#    engine, # SQLAlchemy engine created with create_engine function.
-#    Base.metadata, # SQLAlchemy metadata, required only if create=True.
-#    keyword='db', # Keyword used to inject session database in a route (default 'db').
-#    create=True, # If it is true, execute `metadata.create_all(engine)` when plugin is applied (default False).
-#    commit=True, # If it is true, plugin commit changes after route is executed (default True).
-#    use_kwargs=False # If it is true and keyword is not defined, plugin uses **kwargs argument to inject session database (default False).
-#)
-#
-#app.install(plugin)
+import rrd_uptime
+import rrd_cpu
+import rrd_users
+import rrd_ansible
+import rrd_scratch
 
-
-
-#@app.get('/',sqlalchemy=dict(use_kwargs=True))
 @route('/')
 @view('mainpage')
 def main():
@@ -90,6 +78,11 @@ def machinestats(machine):
 	for j in [7,14,30,60,90,180]:
 	    popularity[j]=usage.getpopularity(j,ip)
 	return dict(date=datetime.datetime.now(),machine=result,popularity=popularity,ip= ip,attr=machine,group=False)
+
+@route('/computer2/<machine>')
+@view('computer2')
+def machinestats(machine):
+	return dict(date=datetime.datetime.now(), machine=machine,group=False)
 
 @route('/image/<machine>/<date>')
 def machinestats_image(machine, date):
@@ -162,6 +155,22 @@ def machinestats(grp):
         recipes=json.dumps(recipes)
 	return dict(date=datetime.datetime.now(),hosts=result,popularity=popularity,tabs=tabs,recipes=recipes,attr=grp,group=True)
 
+@route('/graph/<hostname>_<typ>')
+def graphs(hostname,typ):
+    result = "Error"
+    if   typ == "uptime":
+        result = rrd_uptime.graph(hostname)
+    elif typ == "cpu":
+        result = rrd_cpu.graph(hostname)
+    elif typ == "users":
+        result = rrd_users.graph(hostname)
+    elif typ == "scratch":
+        result = rrd_scratch.graph(hostname)
+    elif typ == "ansible":
+        result = rrd_ansible.graph(hostname)
+    response.set_header('Content-type', 'image/png')
+    return str(result)
+
 @route('/api/ansible',method='POST')
 def acceptansibledata():
 	ip = request.environ.get("REMOTE_ADDR")
@@ -174,6 +183,7 @@ def acceptansibledata():
 	unreachable = request.json['unreachable']
 	failed = request.json['failed']
 	ansiblestats.putansible(hostname, ok, change, unreachable, failed)
+	rrd_ansible.insert(hostname,[ok,change,unreachable,failed])
 	return dict()
 
 @route('/api/scratch',method='POST')
@@ -185,6 +195,7 @@ def acceptscratchdata():
 	scratch_free = request.json['scratch_free']
 	scratch_total = request.json['scratch_total']
 	scratchstats.putscratch(hostname, scratch_total, scratch_free)
+	rrd_scratch.insert(hostname, [scratch_free, scratch_total])
 	return dict()
 	
 
