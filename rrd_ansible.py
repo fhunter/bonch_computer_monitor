@@ -8,10 +8,10 @@ def graph(hostname):
         "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname) ,
         "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname) ,
         "DEF:failed=rrds/%s_ansible.rrd:failed:LAST" % (hostname) ,
-        "LINE1:ok#0000FF:ok",
-        "LINE2:change#0000FF:change",
+        "LINE1:ok#00FF00:ok",
+        "LINE2:change#FFFF00:change",
         "LINE3:unreachable#0000FF:unreachable",
-        "LINE4:failed#0000FF:failed",
+        "LINE4:failed#FF0000:failed",
         "CDEF:unavailable=ok,UN,INF,0,IF",
         "AREA:unavailable#f0f0f0",
         )
