@@ -1,0 +1,45 @@
+import rrdtool
+
+
+##!/bin/bash
+#rrdtool create termserver2_ansible.rrd \
+#    --start $(date +%s --date="-2years") \
+#    --step 900 \
+#    DS:ok:GAUGE:1200:0:500 \
+#    DS:change:GAUGE:1200:0:500 \
+#    DS:unreachable:GAUGE:1200:0:500 \
+#    DS:failed:GAUGE:1200:0:500 \
+#    RRA:AVERAGE:0.5:1:1200 \
+#    RRA:AVERAGE:0.5:6:1200 \
+#    RRA:AVERAGE:0.5:24:1200 \
+#    RRA:MIN:0.5:1:1200 \
+#    RRA:MIN:0.5:6:1200 \
+#    RRA:MIN:0.5:24:1200 \
+#    RRA:MAX:0.5:1:1200 \
+#    RRA:MAX:0.5:6:1200 \
+#    RRA:MAX:0.5:24:1200 \
+#    RRA:LAST:0.5:1:1200 \
+#    RRA:LAST:0.5:6:1200 \
+#    RRA:LAST:0.5:24:1200
+
+
+def graph(hostname):
+    test = rrdtool.graphv("-", "--start", "-1y", "-w 800", "--title=Ansible %s" % hostname,
+        "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname) ,
+        "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname) ,
+        "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname) ,
+        "DEF:failed=rrds/%s_ansible.rrd:failed:LAST" % (hostname) ,
+        "LINE1:ok#0000FF:ok",
+        "LINE2:change#0000FF:change",
+        "LINE3:unreachable#0000FF:unreachable",
+        "LINE4:failed#0000FF:failed",
+        "CDEF:unavailable=ok,UN,INF,0,IF",
+        "AREA:unavailable#f0f0f0",
+        )
+    return test['image']
+
+def insert(hostname, data): #FIXME - implement
+    return ""
+
+def last(hostname): #FIXME - implement
+    return -1

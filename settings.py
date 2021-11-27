@@ -1,2 +1,2 @@
 
-PREFIX='/monitor/'
+PREFIX='/online/'
