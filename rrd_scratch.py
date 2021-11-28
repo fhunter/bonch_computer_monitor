@@ -45,7 +45,7 @@ def create(hostname):
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_scratch.rrd"
         rrdtool.create(rrdname, '--start', '-2years',
-            '--step 900',
+            '--step', '900',
             'DS:free:GAUGE:1200:0:10995116277760',
             'DS:total:GAUGE:1200:0:10995116277760',
             'RRA:AVERAGE:0.5:1:1200',
@@ -65,5 +65,19 @@ def create(hostname):
     else:
         return False
 
-def last(hostname): #FIXME - implement
-    return -1
+def last(hostname):
+    rrdname = "rrds/" + hostname + "_scratch.rrd"
+    try:
+        last = rrdtool.last(rrdname)
+    except:
+        return None
+    return last
+
+def latest(hostname):
+    rrdname = "rrds/" + hostname + "_scratch.rrd"
+    try:
+        info = rrdtool.info(rrdname)
+        lastupdate = [ info['last_update'], info['ds[free].last_ds'], info['ds[total].last_ds'] ]
+        return lastupdate
+    except:
+        return None

@@ -62,7 +62,7 @@ def last(hostname):
         return None
     return last
 
-def latest(hostname): #FIXME - implement
+def latest(hostname):
     rrdname = "rrds/" + hostname + "_ansible.rrd"
     try:
         info = rrdtool.info(rrdname)
