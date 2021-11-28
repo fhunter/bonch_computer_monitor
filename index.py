@@ -188,7 +188,6 @@ def acceptscratchdata():
             hostname = socket.gethostbyaddr(ip)[0]
         scratch_free = request.json['scratch_free']
         scratch_total = request.json['scratch_total']
-        scratchstats.putscratch(hostname, scratch_total, scratch_free)
         rrd_scratch.insert(hostname, [scratch_free, scratch_total])
         return dict()
         
