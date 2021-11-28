@@ -11,7 +11,6 @@ import re
 from bottle import route, view, request, template, static_file, response, abort, redirect
 from my_db import db_exec_sql
 import usage
-import scratchstats
 from PIL import Image
 import StringIO
 
