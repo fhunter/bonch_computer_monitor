@@ -16,7 +16,6 @@
 <th rowspan=2>Статус</th><th rowspan=2>Пользователи<br/>(за 10 минут)</th>
 <th colspan=3>Использование за месяц<br/> часов:минут:секунд</th>
 <th rowspan=2>Объём /scratch </th>
-<th rowspan=2>Статус батареи CMOS </th>
 <th rowspan=2>Отчёт<br/>Ansible</th>
 </tr>
 <tr>
@@ -65,11 +64,6 @@
 </td>
 %if i[8]:
 <td>{{int(i[8][2]/(1024*1024*1024))}}/{{int(i[8][1]/(1024*1024*1024))}} Гб</td>
-%else:
-<td>N/A</td>
-%end
-%if i[9]:
-<td>{{i[9]}}</td>
 %else:
 <td>N/A</td>
 %end

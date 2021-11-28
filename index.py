@@ -15,7 +15,6 @@ from PIL import Image
 import StringIO
 
 from bottle import HTTPError
-from bottle.ext import sqlalchemy
 
 import rrd_uptime
 import rrd_cpu
