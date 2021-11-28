@@ -53,7 +53,7 @@ def main():
             temp = []
             for record in result:
                 ansible = rrd_ansible.latest(str(record[2]))
-                scratch = scratchstats.getscratch(record[2]) # time, full, free
+                scratch = rrd_scratch.latest(str(record[2])) 
                 temptuple = record + (usage.getpowered(30,record[1]),usage.getusage(30,record[1]),ansible,scratch,'NaN')
                 temp.append(temptuple)
             displaydata[i]['values']=temp

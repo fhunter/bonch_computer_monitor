@@ -77,7 +77,7 @@ def latest(hostname):
     rrdname = "rrds/" + hostname + "_scratch.rrd"
     try:
         info = rrdtool.info(rrdname)
-        lastupdate = [ info['last_update'], info['ds[free].last_ds'], info['ds[total].last_ds'] ]
+        lastupdate = [ info['last_update'], int(info['ds[total].last_ds']), int(info['ds[free].last_ds']) ]
         return lastupdate
     except:
         return None
