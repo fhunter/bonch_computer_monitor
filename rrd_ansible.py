@@ -54,5 +54,19 @@ def create(hostname):
     else:
         return False
 
-def last(hostname): #FIXME - implement
-    return -1
+def last(hostname):
+    rrdname = "rrds/" + hostname + "_ansible.rrd"
+    try:
+        last = rrdtool.last(rrdname)
+    except:
+        return None
+    return last
+
+def latest(hostname): #FIXME - implement
+    rrdname = "rrds/" + hostname + "_ansible.rrd"
+    try:
+        info = rrdtool.info(rrdname)
+        lastupdate = [ info['last_update'], info['ds[ok].last_ds'], info['ds[change].last_ds'], info['ds[unreachable].last_ds'], info['ds[failed].last_ds'] ]
+        return lastupdate
+    except:
+        return None

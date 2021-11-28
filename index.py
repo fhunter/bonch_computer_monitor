@@ -11,16 +11,12 @@ import re
 from bottle import route, view, request, template, static_file, response, abort, redirect
 from my_db import db_exec_sql
 import usage
-import ansiblestats
 import scratchstats
 from PIL import Image
 import StringIO
 
 from bottle import HTTPError
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Sequence, String
-from sqlalchemy.types import DateTime, Date, Boolean
-from sqlalchemy.ext.declarative import declarative_base
 
 import rrd_uptime
 import rrd_cpu
@@ -56,7 +52,7 @@ def main():
                  result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
             temp = []
             for record in result:
-                ansible = ansiblestats.getansible(record[2])
+                ansible = rrd_ansible.latest(str(record[2]))
                 scratch = scratchstats.getscratch(record[2]) # time, full, free
                 temptuple = record + (usage.getpowered(30,record[1]),usage.getusage(30,record[1]),ansible,scratch,'NaN')
                 temp.append(temptuple)
@@ -182,7 +178,6 @@ def acceptansibledata():
         change = request.json['change']
         unreachable = request.json['unreachable']
         failed = request.json['failed']
-        ansiblestats.putansible(hostname, ok, change, unreachable, failed)
         rrd_ansible.insert(hostname,[ok,change,unreachable,failed])
         return dict()
 

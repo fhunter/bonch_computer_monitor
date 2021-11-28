@@ -80,10 +80,7 @@
 <font color="orange">{{i[7][2]}}</font>/
 <font color="black">{{i[7][3]}}</font>/
 <font color="red">{{i[7][4]}}</font>&nbsp
-%if i[7][0]*24*60*60-i[4]*60 > 30*60:
-{{str(datetime.timedelta(seconds=int(i[7][0]*24*60*60)))}} 
-<font color="red">Ошибка!</font>
-%end
+{{str(datetime.datetime.fromtimestamp(i[7][0])) }}
 %else:
 N/A
 %end
