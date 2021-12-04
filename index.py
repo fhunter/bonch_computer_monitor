@@ -58,21 +58,6 @@ def main():
             displaydata[i]['total']=len(result)
         return dict(data=displaydata,date=datetime.datetime.now(),online=onlinecount,userslog=userslog)
 
-@route('/computer1/<machine>')
-@view('computer1')
-def machinestats(machine):
-        result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
-        if len(result) > 0:
-            ip = result[0][1]
-            result = result[0][0]
-        else:
-            result = None
-            ip = ""
-        popularity={}
-        for j in [7,14,30,60,90,180]:
-            popularity[j]=usage.getpopularity(j,ip)
-        return dict(date=datetime.datetime.now(),machine=result,popularity=popularity,ip= ip,attr=machine,group=False)
-
 @route('/computer2/<machine>')
 @view('computer2')
 def machinestats(machine):
