@@ -11,7 +11,7 @@ def graph(hostname):
         )
     return test['image']
 
-def insert(hostname, data, timestampt="N"):
+def insert(hostname, data, timestamp="N"):
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_uptime.rrd"
@@ -24,7 +24,7 @@ def exists(hostname):
 
 def create(hostname):
     if not exists(hostname):
-        rrdname = "rrds/" + hostname + "_ansible.rrd"
+        rrdname = "rrds/" + hostname + "_uptime.rrd"
         rrdtool.create(rrdname, '--start', '-2years',
                        '--step', '900',
                        'DS:uptime:GAUGE:1200:0:315360000',
