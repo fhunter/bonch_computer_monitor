@@ -4,9 +4,12 @@ def graph(hostname):
     test = rrdtool.graphv("-", "--start", "-1y", "-w 800", "--title=User count %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
+        "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
         "CDEF:users_m=users,UN,0,users,IF",
         "LINE1:users_m#0000FF:Users max",
         "LINE2:usersa#00FFFF:Users average",
+        "CDEF:unavailable=uptime,UN,INF,0,IF",
+        "AREA:unavailable#f0f0f0",
 #        "CDEF:unavailable=users,UN,INF,0,IF",
 #        "AREA:unavailable#f0f0f0",
         )
