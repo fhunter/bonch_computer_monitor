@@ -1,4 +1,24 @@
 import rrdtool
+import os
+
+#rrdtool create termserver2_cpu.rrd \
+#    --start $(date +%s --date="-2years") \
+#    --step 900 \
+#    DS:load:GAUGE:1200:0:5000 \
+#    DS:loadavg:GAUGE:1200:0:5000 \
+#    DS:cores:GAUGE:1200:0:5000 \
+#    RRA:AVERAGE:0.5:1:1200 \
+#    RRA:AVERAGE:0.5:6:1200 \
+#    RRA:AVERAGE:0.5:24:1200 \
+#    RRA:MIN:0.5:1:1200 \
+#    RRA:MIN:0.5:6:1200 \
+#    RRA:MIN:0.5:24:1200 \
+#    RRA:MAX:0.5:1:1200 \
+#    RRA:MAX:0.5:6:1200 \
+#    RRA:MAX:0.5:24:1200 \
+#    RRA:LAST:0.5:1:1200 \
+#    RRA:LAST:0.5:6:1200 \
+#    RRA:LAST:0.5:24:1200
 
 def graph(hostname):
     test = rrdtool.graphv("-", "--start", "-1y", "-w 800", "--title=Load %s" % hostname,
@@ -13,8 +33,56 @@ def graph(hostname):
         )
     return test['image']
 
-def insert(hostname, data): #FIXME - implement
-    return ""
+def insert(hostname, data, timestamp = "N"):
+    if not exists(hostname):
+        create(hostname)
+    rrdname = "rrds/" + hostname + "_cpu.rrd"
+    rrdtool.update(rrdname, '%s:%s:%s:%s' % (timestamp,data[0],data[1],data[2]))
 
-def last(hostname): #FIXME - implement
-    return -1
+def exists(hostname):
+    rrdname = "rrds/" + hostname + "_cpu.rrd"
+    return os.path.exists(rrdname)
+
+
+def create(hostname):
+    if not exists(hostname):
+        rrdname = "rrds/" + hostname + "_scratch.rrd"
+        rrdtool.create(rrdname, '--start', '-2years',
+            '--step', '900',
+            'DS:load:GAUGE:1200:0:5000',
+            'DS:loadavg:GAUGE:1200:0:5000',
+            'DS:cores:GAUGE:1200:0:5000',
+            'RRA:AVERAGE:0.5:1:1200',
+            'RRA:AVERAGE:0.5:6:1200',
+            'RRA:AVERAGE:0.5:24:1200',
+            'RRA:MIN:0.5:1:1200',
+            'RRA:MIN:0.5:6:1200',
+            'RRA:MIN:0.5:24:1200',
+            'RRA:MAX:0.5:1:1200',
+            'RRA:MAX:0.5:6:1200',
+            'RRA:MAX:0.5:24:1200',
+            'RRA:LAST:0.5:1:1200',
+            'RRA:LAST:0.5:6:1200',
+            'RRA:LAST:0.5:24:1200'
+          )
+        return True
+    else:
+        return False
+
+def last(hostname):
+    rrdname = "rrds/" + hostname + "_cpu.rrd"
+    try:
+        last = rrdtool.last(rrdname)
+    except:
+        return None
+    return last
+
+def latest(hostname):
+    rrdname = "rrds/" + hostname + "_cpu.rrd"
+    try:
+        info = rrdtool.info(rrdname)
+        lastupdate = [ info['last_update'], float(info['ds[load].last_ds']), float(info['ds[loadavg].last_ds'],float(info['ds[cores].last_ds'])) ]
+        return lastupdate
+    except:
+        return None
+
