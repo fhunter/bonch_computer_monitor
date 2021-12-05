@@ -20,7 +20,7 @@ import os
 #    RRA:LAST:0.5:24:1200
 
 def graph(hostname):
-    test = rrdtool.graphv("-", "--start", "-1d", "-w 800", "--title=/scratch %s" % hostname,
+    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=/scratch %s" % hostname,
                         "DEF:free=rrds/%s_scratch.rrd:free:LAST" % (hostname) ,
                         "DEF:total=rrds/%s_scratch.rrd:total:LAST" % (hostname) ,
                         "LINE1:total#0000FF:Total",

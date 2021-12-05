@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # coding=utf-8
 import datetime
+import time
 import json
 import socket
 import os.path
@@ -14,6 +15,8 @@ import rrd_cpu
 import rrd_users
 import rrd_ansible
 import rrd_scratch
+
+import session_pc
 
 
 @route('/')
@@ -55,7 +58,10 @@ def main():
 @route('/computer2/<machine>')
 @view('computer2')
 def machinestats3(machine):
-    return dict(date=datetime.datetime.now(), machine=machine, group=False)
+    sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
+    sessions_user=[]
+    sessions_user_open=[]
+    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False)
 
 @route('/computer/<machine>')
 @view('computer')
@@ -167,6 +173,9 @@ def acceptdata():
     cpu = request.json['cpu']
     db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip_addr, reportedhostname))
     db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip_addr, uptime))
+    rrd_uptime.insert(hostname, [uptime, ])
+    rrd_cpu.insert(hostname, [cpu['load'], cpu['loadavg'], cpu['cores']])
+    rrd_users.insert(hostname, [len(set(users)),])
     for i in users:
         db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
     db_exec_sql("insert into load (ip, time, cpuload, loadavg, cores) values ( ?, DATETIME('now'), ?, ?, ?)", (ip_addr, cpu['load'], cpu['loadavg'], cpu['cores']))

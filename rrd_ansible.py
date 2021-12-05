@@ -3,7 +3,7 @@ import rrdtool
 
 
 def graph(hostname):
-    test = rrdtool.graphv("-", "--start", "-1d", "-w 800", "--title=Ansible %s" % hostname,
+    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Ansible %s" % hostname,
                           "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname),
                           "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname),
                           "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname),

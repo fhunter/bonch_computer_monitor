@@ -1,7 +1,8 @@
+import os
 import rrdtool
 
 def graph(hostname):
-    test = rrdtool.graphv("-", "--start", "-1y", "-w 800", "--title=User count %s" % hostname,
+    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=User count %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
@@ -13,11 +14,11 @@ def graph(hostname):
         )
     return test['image']
 
-def insert(hostname, data):
+def insert(hostname, data, timestamp="N"):
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_users.rrd"
-    rrdtool.update(rrdname, '%s:%s:%s:%s:%s' % (timestamp, data[0], data[1], data[2], data[3]))
+    rrdtool.update(rrdname, '%s:%s' % (timestamp, data[0], ))
 
 def exists(hostname):
     rrdname = "rrds/" + hostname + "_users.rrd"

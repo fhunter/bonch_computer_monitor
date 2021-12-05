@@ -21,7 +21,7 @@ import rrdtool
 #    RRA:LAST:0.5:24:1200
 
 def graph(hostname):
-    test = rrdtool.graphv("-", "--start", "-1y", "-w 800", "--title=Load %s" % hostname,
+    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Load %s" % hostname,
                           "DEF:load=rrds/%s_cpu.rrd:load:LAST" % (hostname),
                           "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
                           "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),

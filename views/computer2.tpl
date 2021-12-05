@@ -5,9 +5,18 @@
 %import usage
 %import settings
 <h2>Включения компьютера</h2>
+%for i in sessions_pc:
+{{i}} <br/>
+%end
 <h2>Пользовательские сессии</h2>
 <h3>Открытые</h3>
+%for i in sessions_user:
+{{i}} <br/>
+%end
 <h3>Недавние</h3>
+%for i in sessions_open:
+{{i}} <br/>
+%end
 <h2>Uptime</h2>
 <img src={{settings.PREFIX}}/graph/{{machine}}_uptime>
 <h2>Нагрузка на процессор</h2>
