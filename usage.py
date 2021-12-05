@@ -5,31 +5,31 @@ import datetime
 from my_db import db_exec_sql
 
 
-def getdetailedusage(day,ip):
-	""" Использование компьютера за определённый период """
-	users_result = db_exec_sql("select time,users from users where (ip = ?) and (date(time) = date(?)) order by time ",(ip, day))
-	""" Время во включенном состоянии компьютера за определённый период  period - в днях"""
-	uptime_result = db_exec_sql("select time,cpuload from load where (ip = ?) and (date(time) = date(?)) order by time ",(ip, day))
-	users = {}
-	uptime = {}
-	for i,j in users_result:
-	    time = datetime.datetime.strptime(i,'%Y-%m-%d %H:%M:%S')
-	    hour = time.hour
-	    minute = time.minute
-	    time = hour*60 + minute
-	    time = time/5
-	    if time in users:
-	        users[time].append(j)
-	    else:
-		users[time]=[j,]
-	for i,j in uptime_result:
-	    time = datetime.datetime.strptime(i,'%Y-%m-%d %H:%M:%S')
-	    hour = time.hour
-	    minute = time.minute
-	    time = hour*60 + minute
-	    time = time/5
-	    uptime[time]=j
-	return users,uptime
+#def getdetailedusage(day,ip):
+#	""" Использование компьютера за определённый период """
+#	users_result = db_exec_sql("select time,users from users where (ip = ?) and (date(time) = date(?)) order by time ",(ip, day))
+#	""" Время во включенном состоянии компьютера за определённый период  period - в днях"""
+#	uptime_result = db_exec_sql("select time,cpuload from load where (ip = ?) and (date(time) = date(?)) order by time ",(ip, day))
+#	users = {}
+#	uptime = {}
+#	for i,j in users_result:
+#	    time = datetime.datetime.strptime(i,'%Y-%m-%d %H:%M:%S')
+#	    hour = time.hour
+#	    minute = time.minute
+#	    time = hour*60 + minute
+#	    time = time/5
+#	    if time in users:
+#	        users[time].append(j)
+#	    else:
+#		users[time]=[j,]
+#	for i,j in uptime_result:
+#	    time = datetime.datetime.strptime(i,'%Y-%m-%d %H:%M:%S')
+#	    hour = time.hour
+#	    minute = time.minute
+#	    time = hour*60 + minute
+#	    time = time/5
+#	    uptime[time]=j
+#	return users,uptime
 
 def getpopularity(period, ip):
 	""" Популярность компьютера и проведённое на нём время
@@ -66,6 +66,6 @@ def putansible(hostname,ok,change,unreachable,failed):
 
 def getpowered(period,ip):
 	""" Время во включенном состоянии компьютера за определённый период  period - в днях"""
-	result = db_exec_sql("select count() from load where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
+	result = db_exec_sql("select count() from uptime where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
 	return result[0][0]*5
 

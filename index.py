@@ -178,7 +178,6 @@ def acceptdata():
     rrd_users.insert(hostname, [len(set(users)),])
     for i in users:
         db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
-    db_exec_sql("insert into load (ip, time, cpuload, loadavg, cores) values ( ?, DATETIME('now'), ?, ?, ?)", (ip_addr, cpu['load'], cpu['loadavg'], cpu['cores']))
     return dict()
 
 bottle.run(server=bottle.CGIServer)

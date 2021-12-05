@@ -4,7 +4,6 @@ CREATE TABLE machines (id integer primary key autoincrement not null, ip text un
 CREATE TABLE hostnames (id integer primary key autoincrement not null, ip text not null, hostname text, time datetime not null);
 CREATE TABLE uptime (id integer primary key autoincrement not null, ip text not null,  time datetime not null, uptime integer not null);
 CREATE TABLE users (id integer primary key autoincrement not null, ip text not null,  time datetime not null, users text);
-CREATE TABLE load (id integer primary key autoincrement not null, ip text not null, time datetime not null, cpuload real not null, loadavg real not null, cores integer not null);
 CREATE TABLE user_sessions (id integer primary key autoincrement not null, hostname text not null, starttime datetime not null, endtime datetime, users text);
 CREATE TABLE host_sessions (id integer primary key autoincrement not null, hostname text not null, starttime datetime not null, endtime datetime);
 CREATE UNIQUE INDEX hostnames_index on hostnames(ip, time);
