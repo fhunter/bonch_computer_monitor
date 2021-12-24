@@ -1,9 +1,10 @@
 import os
 import rrdtool
+from period import period_conv
 
 
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Uptime %s" % hostname,
+    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % hostname,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
         "LINE1:uptime#0000FF:Uptime",
         "CDEF:unavailable=uptime,UN,INF,0,IF",

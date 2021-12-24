@@ -1,5 +1,6 @@
 import os
 import rrdtool
+from period import period_conv
 
 #rrdtool create termserver2_cpu.rrd \
 #    --start $(date +%s --date="-2years") \
@@ -21,7 +22,7 @@ import rrdtool
 #    RRA:LAST:0.5:24:1200
 
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Load %s" % hostname,
+    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
                           "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
                           "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),

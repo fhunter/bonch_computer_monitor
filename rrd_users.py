@@ -1,8 +1,9 @@
 import os
 import rrdtool
+from period import period_conv
 
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=User count %s" % hostname,
+    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=User count %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,

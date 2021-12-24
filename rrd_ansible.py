@@ -1,9 +1,10 @@
 import os
 import rrdtool
+from period import period_conv
 
 
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Ansible %s" % hostname,
+    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Ansible %s" % hostname,
                           "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname),
                           "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname),
                           "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname),

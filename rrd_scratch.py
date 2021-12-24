@@ -1,5 +1,6 @@
 import rrdtool
 import os
+from period import period_conv
 
 #rrdtool create termserver2_scratch.rrd \
 #    --start $(date +%s --date="-2years") \
@@ -20,7 +21,7 @@ import os
 #    RRA:LAST:0.5:24:1200
 
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=/scratch %s" % hostname,
+    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=/scratch %s" % hostname,
                         "DEF:free=rrds/%s_scratch.rrd:free:LAST" % (hostname) ,
                         "DEF:total=rrds/%s_scratch.rrd:total:LAST" % (hostname) ,
                         "LINE1:total#0000FF:Total",
