@@ -62,7 +62,7 @@ def machinestats3(machine,period = 'w'):
     sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
     sessions_user=[]
     sessions_user_open=[]
-    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False)
+    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False, period=period)
 
 @route('/computer/<machine>')
 @view('computer')

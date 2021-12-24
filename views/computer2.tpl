@@ -18,14 +18,14 @@
 {{i}} <br/>
 %end
 <h2>Uptime</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_uptime>
+<img src={{settings.PREFIX}}/graph/{{machine}}_uptime/{{period}}>
 <h2>Нагрузка на процессор</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_cpu>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu/{{period}}>
 <h2>Количество пользователей</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_users>
+<img src={{settings.PREFIX}}/graph/{{machine}}_users/{{period}}>
 <h2>Свободное место на scratch</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_scratch>
+<img src={{settings.PREFIX}}/graph/{{machine}}_scratch/{{period}}>
 <h2>Статус ansible</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_ansible>
+<img src={{settings.PREFIX}}/graph/{{machine}}_ansible/{{period}}>
 
 %include footer
