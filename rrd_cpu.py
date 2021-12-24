@@ -20,11 +20,12 @@ import rrdtool
 #    RRA:LAST:0.5:6:1200 \
 #    RRA:LAST:0.5:24:1200
 
-def graph(hostname):
+def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Load %s" % hostname,
-                          "DEF:load=rrds/%s_cpu.rrd:load:LAST" % (hostname),
+                          "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
                           "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
                           "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),
+                          "CDEF:load100=load,100,/",
                           "LINE1:load#0000FF:load",
                           "LINE2:cores#00FFFF:cores",
                           "LINE3:loadavg#FF00FF:loadavg",

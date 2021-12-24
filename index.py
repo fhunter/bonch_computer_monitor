@@ -55,9 +55,10 @@ def main():
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata, date=datetime.datetime.now(), online=onlinecount, userslog=userslog)
 
+@route('/computer2/<machine>/<period:re:[d,w,m,y]>')
 @route('/computer2/<machine>')
 @view('computer2')
-def machinestats3(machine):
+def machinestats3(machine,period = 'w'):
     sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
     sessions_user=[]
     sessions_user_open=[]
@@ -111,18 +112,19 @@ def machinestats(grp):
     return dict(date=datetime.datetime.now(), hosts=result, popularity=popularity, tabs=tabs2, recipes=recipes2, attr=grp, group=True)
 
 @route('/graph/<hostname>_<typ>')
-def graphs(hostname, typ):
+@route('/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
+def graphs(hostname, typ, period = 'w'):
     result = "Error"
     if   typ == "uptime":
-        result = rrd_uptime.graph(hostname)
+        result = rrd_uptime.graph(hostname, period)
     elif typ == "cpu":
-        result = rrd_cpu.graph(hostname)
+        result = rrd_cpu.graph(hostname, period)
     elif typ == "users":
-        result = rrd_users.graph(hostname)
+        result = rrd_users.graph(hostname, period)
     elif typ == "scratch":
-        result = rrd_scratch.graph(hostname)
+        result = rrd_scratch.graph(hostname, period)
     elif typ == "ansible":
-        result = rrd_ansible.graph(hostname)
+        result = rrd_ansible.graph(hostname, period)
     response.set_header('Content-type', 'image/png')
     return str(result)
 

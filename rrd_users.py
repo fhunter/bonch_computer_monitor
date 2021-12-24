@@ -1,7 +1,7 @@
 import os
 import rrdtool
 
-def graph(hostname):
+def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=User count %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,

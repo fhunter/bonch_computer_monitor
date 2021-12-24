@@ -2,7 +2,7 @@ import os
 import rrdtool
 
 
-def graph(hostname):
+def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Ansible %s" % hostname,
                           "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname),
                           "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname),

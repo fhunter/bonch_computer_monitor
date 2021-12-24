@@ -2,7 +2,7 @@ import os
 import rrdtool
 
 
-def graph(hostname):
+def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", "-1m", "-w 800", "--title=Uptime %s" % hostname,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
         "LINE1:uptime#0000FF:Uptime",
