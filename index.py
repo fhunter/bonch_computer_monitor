@@ -34,7 +34,7 @@ def main():
             userslog[i[0]] = i[1]
     onlinecount = online[0][0]
     displaydata = {}
-    for i in ['a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
+    for i in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'p4n', 'misc']:
         displaydata[i] = {}
         displaydata[i]['name'] = u"Аудитория "+i
         displaydata[i]['link'] = i
@@ -77,13 +77,13 @@ def machinestats2(machine):
     popularity = {}
     for j in [7, 14, 30, 60, 90, 180]:
         popularity[j] = usage.getpopularity(j, ip_addr)
-    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False)
+    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period="m")
 
 
 @route('/group/<grp>')
 @view('group')
 def machinestats(grp):
-    if grp in ['a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
+    if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
         if grp == 'misc':
             result = db_exec_sql("select hostname,ip from machines where room is NULL order by hostname")
         else:

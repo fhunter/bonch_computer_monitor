@@ -1,6 +1,16 @@
 %include header_graphs
+%import settings
 <h1>Графики для {{machine}}</h1>
 %include menu
+
+<h2>Нагрузка на процессор</h2>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu/{{period}}>
+<h2>Количество пользователей</h2>
+<img src={{settings.PREFIX}}/graph/{{machine}}_users/{{period}}>
+<h2>Свободное место на scratch</h2>
+<img src={{settings.PREFIX}}/graph/{{machine}}_scratch/{{period}}>
+<h2>Статус ansible</h2>
+<img src={{settings.PREFIX}}/graph/{{machine}}_ansible/{{period}}>
 
 <table border=1 width=75%>
 <thead>
