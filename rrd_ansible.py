@@ -9,7 +9,7 @@ def graph(hostname, period):
                           "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname),
                           "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname),
                           "DEF:failed=rrds/%s_ansible.rrd:failed:LAST" % (hostname),
-                          "LINE1:ok#00FF00:ok",
+                          "LINE2:ok#00FF00:ok",
                           "LINE2:change#FFFF00:change",
                           "LINE3:unreachable#0000FF:unreachable",
                           "LINE4:failed#FF0000:failed",

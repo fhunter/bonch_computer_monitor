@@ -8,7 +8,7 @@ def graph(hostname, period):
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
         "CDEF:users_m=users,UN,0,users,IF",
-        "LINE1:users_m#0000FF:Users max",
+        "LINE2:users_m#0000FF:Users max",
         "LINE2:usersa#00FFFF:Users average",
         "CDEF:unavailable=uptime,UN,INF,0,IF",
         "AREA:unavailable#f0f0f0",

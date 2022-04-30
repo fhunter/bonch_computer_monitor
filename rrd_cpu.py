@@ -27,9 +27,9 @@ def graph(hostname, period):
                           "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
                           "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),
                           "CDEF:load100=load,100,/",
-                          "LINE1:load#0000FF:load",
+                          "LINE2:load#0000FF:load",
                           "LINE2:cores#00FFFF:cores",
-                          "LINE3:loadavg#FF00FF:loadavg",
+                          "LINE2:loadavg#FF00FF:loadavg",
                           "CDEF:unavailable=load,UN,INF,0,IF",
                           "AREA:unavailable#f0f0f0",
                          )

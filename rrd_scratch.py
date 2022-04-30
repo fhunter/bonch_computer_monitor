@@ -24,8 +24,8 @@ def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=/scratch %s" % hostname,
                         "DEF:free=rrds/%s_scratch.rrd:free:LAST" % (hostname) ,
                         "DEF:total=rrds/%s_scratch.rrd:total:LAST" % (hostname) ,
-                        "LINE1:total#0000FF:Total",
-                        "LINE1:free#0000FF:Free",
+                        "LINE2:total#009F00:Total",
+                        "LINE2:free#FF00FF:Free",
                         "CDEF:unavailable=total,UN,INF,0,IF",
                         "AREA:unavailable#f0f0f0",
     )
