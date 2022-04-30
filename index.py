@@ -83,7 +83,7 @@ def machinestats2(machine):
 @route('/group/<grp>')
 @view('group')
 def machinestats(grp):
-    if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
+    if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'p4n', 'misc']:
         if grp == 'misc':
             result = db_exec_sql("select hostname,ip from machines where room is NULL order by hostname")
         else:
