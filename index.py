@@ -55,18 +55,19 @@ def main():
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata, date=datetime.datetime.now(), online=onlinecount, userslog=userslog)
 
-@route('/computer2/<machine>/<period:re:[d,w,m,y]>')
-@route('/computer2/<machine>')
-@view('computer2')
-def machinestats3(machine,period = 'w'):
-    sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
-    sessions_user=[]
-    sessions_user_open=[]
-    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False, period=period)
+#@route('/computer2/<machine>/<period:re:[d,w,m,y]>')
+#@route('/computer2/<machine>')
+#@view('computer2')
+#def machinestats3(machine,period = 'w'):
+#    sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
+#    sessions_user=[]
+#    sessions_user_open=[]
+#    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False, period=period)
 
+@route('/computer/<machine>/<period:re:[d,w,m,y]>')
 @route('/computer/<machine>')
 @view('computer')
-def machinestats2(machine):
+def machinestats2(machine,period = 'w'):
     result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
     if len(result) > 0:
         ip_addr = result[0][1]
@@ -77,7 +78,7 @@ def machinestats2(machine):
     popularity = {}
     for j in [7, 14, 30, 60, 90, 180]:
         popularity[j] = usage.getpopularity(j, ip_addr)
-    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period="m")
+    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period=period)
 
 
 @route('/group/<grp>')
