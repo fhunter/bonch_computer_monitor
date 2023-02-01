@@ -34,7 +34,7 @@ def main():
             userslog[i[0]] = i[1]
     onlinecount = online[0][0]
     displaydata = {}
-    for i in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'p4n', 'misc']:
+    for i in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
         displaydata[i] = {}
         displaydata[i]['name'] = u"Аудитория "+i
         displaydata[i]['link'] = i
@@ -84,7 +84,7 @@ def machinestats2(machine,period = 'w'):
 @route('/group/<grp>')
 @view('group')
 def machinestats(grp):
-    if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'p4n', 'misc']:
+    if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
         if grp == 'misc':
             result = db_exec_sql("select hostname,ip from machines where room is NULL order by hostname")
         else:
@@ -135,12 +135,14 @@ def acceptansibledata():
     hostname = request.environ.get("REMOTE_HOST")
     if hostname is None:
         hostname = socket.gethostbyaddr(ip_addr)[0]
-    #CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
-    ok_value = request.json['ok']
-    change_value = request.json['change']
-    unreachable_value = request.json['unreachable']
-    failed_value = request.json['failed']
-    rrd_ansible.insert(hostname, [ok_value, change_value, unreachable_value, failed_value])
+    try:
+        ok_value = request.json['ok']
+        change_value = request.json['change']
+        unreachable_value = request.json['unreachable']
+        failed_value = request.json['failed']
+        rrd_ansible.insert(hostname, [ok_value, change_value, unreachable_value, failed_value])
+    except:
+        pass
     return dict()
 
 @route('/api/scratch', method='POST')
