@@ -4,7 +4,9 @@
 %include menu
 
 <h2>Нагрузка на процессор</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_cpu/{{period}}>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu1/{{period}}><br/>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu2/{{period}}><br/>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu3/{{period}}>
 <h2>Количество пользователей</h2>
 <img src={{settings.PREFIX}}/graph/{{machine}}_users/{{period}}>
 <h2>Свободное место на scratch</h2>
