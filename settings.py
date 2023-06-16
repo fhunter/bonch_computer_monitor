@@ -1,2 +1,2 @@
 
-PREFIX='/online/'
+PREFIX='/online'

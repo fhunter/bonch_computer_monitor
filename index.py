@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # coding=utf-8
 import datetime
 import time
@@ -8,6 +8,7 @@ import os.path
 import bottle
 from bottle import route, view, request, response
 from my_db import db_exec_sql
+from my_db import Session, Room, UserSession, ComputerSession, Computer
 import usage
 
 import rrd_uptime
@@ -17,35 +18,39 @@ import rrd_ansible
 import rrd_scratch
 
 import session_pc
+import settings
 
+app = application = bottle.Bottle()
 
-@route('/')
+@app.route(settings.PREFIX + '/')
 @view('mainpage')
 def main():
-        #result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines order by hostname")
-    online = db_exec_sql("select count() from machines where (julianday('now')-julianday(lastupdate))*24*60 < 10")
-    usersloggedin = db_exec_sql("select ip, users from users where (julianday('now')-julianday(time))*24*60 < 10 group by ip,users")
+    session = Session()
+    onlinecount = session.query(ComputerSession).filter(ComputerSession.session_end==None).count()
+    usersloggedin = session.query(UserSession).filter(UserSession.session_end==None).all()
+    rooms = session.query(Room).all()
     userslog = dict()
-    for i in usersloggedin:
-        if i[0] in userslog:
-            temp = userslog[i[0]]
-            userslog[i[0]] = temp + " " + i[1]
-        else:
-            userslog[i[0]] = i[1]
-    onlinecount = online[0][0]
+#    for i in usersloggedin:
+#        if i[0] in userslog:
+#            temp = userslog[i[0]]
+#            userslog[i[0]] = temp + " " + i[1]
+#        else:
+#            userslog[i[0]] = i[1]
+#    onlinecount = online[0][0]
     displaydata = {}
-    for i in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
+    for i in rooms:
         displaydata[i] = {}
-        displaydata[i]['name'] = u"Аудитория "+i
-        displaydata[i]['link'] = i
+        displaydata[i]['name'] = u"Аудитория "+i.name
+        displaydata[i]['link'] = i.name
         displaydata[i]['online'] = 0
         room = (i, )
-        if i == 'misc':
-            displaydata[i]['name'] = u"Прочее"
-            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room is NULL order by hostname")
-        else:
-            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
+#        if i == 'misc':
+#            displaydata[i]['name'] = u"Прочее"
+#            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room is NULL order by hostname")
+#        else:
+#            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
         temp = []
+        result = []
         for record in result:
             ansible = rrd_ansible.latest(str(record[2]))
             scratch = rrd_scratch.latest(str(record[2]))
@@ -55,8 +60,8 @@ def main():
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata, date=datetime.datetime.now(), online=onlinecount, userslog=userslog)
 
-#@route('/computer2/<machine>/<period:re:[d,w,m,y]>')
-#@route('/computer2/<machine>')
+#@app.route(settings.PREFIX +'/computer2/<machine>/<period:re:[d,w,m,y]>')
+#@app.route(settings.PREFIX +'/computer2/<machine>')
 #@view('computer2')
 #def machinestats3(machine,period = 'w'):
 #    sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
@@ -64,8 +69,18 @@ def main():
 #    sessions_user_open=[]
 #    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False, period=period)
 
-@route('/computer/<machine>/<period:re:[d,w,m,y]>')
-@route('/computer/<machine>')
+@app.route(settings.PREFIX + '/debug/')
+@view('debug')
+def main():
+    session = Session()
+    usersloggedin = session.query(UserSession).all()
+    rooms = session.query(Room).all()
+    computers = session.query(ComputerSession).all()
+    computer = session.query(Computer).all()
+    return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer)
+
+@app.route(settings.PREFIX +'/computer/<machine>/<period:re:[d,w,m,y]>')
+@app.route(settings.PREFIX +'/computer/<machine>')
 @view('computer')
 def machinestats2(machine,period = 'w'):
     result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
@@ -81,7 +96,7 @@ def machinestats2(machine,period = 'w'):
     return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period=period)
 
 
-@route('/group/<grp>')
+@app.route(settings.PREFIX +'/group/<grp>')
 @view('group')
 def machinestats(grp):
     if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
@@ -112,14 +127,18 @@ def machinestats(grp):
     recipes2 = json.dumps(recipes)
     return dict(date=datetime.datetime.now(), hosts=result, popularity=popularity, tabs=tabs2, recipes=recipes2, attr=grp, group=True)
 
-@route('/graph/<hostname>_<typ>')
-@route('/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
+@app.route(settings.PREFIX +'/graph/<hostname>_<typ>')
+@app.route(settings.PREFIX +'/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
 def graphs(hostname, typ, period = 'w'):
     result = "Error"
     if   typ == "uptime":
         result = rrd_uptime.graph(hostname, period)
-    elif typ == "cpu":
-        result = rrd_cpu.graph(hostname, period)
+    elif typ == "cpu1":
+        result = rrd_cpu.graph1(hostname, period)
+    elif typ == "cpu2":
+        result = rrd_cpu.graph2(hostname, period)
+    elif typ == "cpu3":
+        result = rrd_cpu.graph3(hostname, period)
     elif typ == "users":
         result = rrd_users.graph(hostname, period)
     elif typ == "scratch":
@@ -129,7 +148,7 @@ def graphs(hostname, typ, period = 'w'):
     response.set_header('Content-type', 'image/png')
     return str(result)
 
-@route('/api/ansible', method='POST')
+@app.route(settings.PREFIX +'/api/ansible', method='POST')
 def acceptansibledata():
     ip_addr = request.environ.get("REMOTE_ADDR")
     hostname = request.environ.get("REMOTE_HOST")
@@ -145,7 +164,7 @@ def acceptansibledata():
         pass
     return dict()
 
-@route('/api/scratch', method='POST')
+@app.route(settings.PREFIX +'/api/scratch', method='POST')
 def acceptscratchdata():
     ip_addr = request.environ.get("REMOTE_ADDR")
     hostname = request.environ.get("REMOTE_HOST")
@@ -157,7 +176,7 @@ def acceptscratchdata():
     return dict()
 
 
-@route('/api/data', method='POST')
+@app.route(settings.PREFIX +'/api/data', method='POST')
 def acceptdata():
     ip_addr = request.environ.get("REMOTE_ADDR")
     hostname = request.environ.get("REMOTE_HOST")
@@ -185,4 +204,7 @@ def acceptdata():
         db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
     return dict()
 
-bottle.run(server=bottle.CGIServer)
+if __name__ == '__main__':
+    bottle.run(app,
+        host='0.0.0.0',
+        port=8080)
