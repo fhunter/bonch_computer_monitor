@@ -1,10 +1,16 @@
 %include header_graphs
 %import settings
 <h1>Графики для {{machine}}</h1>
+<a href=./d>День</a>
+<a href=./w>Неделя</a>
+<a href=./m>Месяц</a>
+<a href=./y>Год</a>
 %include menu
 
 <h2>Нагрузка на процессор</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_cpu/{{period}}>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu1/{{period}}><br/>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu2/{{period}}><br/>
+<img src={{settings.PREFIX}}/graph/{{machine}}_cpu3/{{period}}>
 <h2>Количество пользователей</h2>
 <img src={{settings.PREFIX}}/graph/{{machine}}_users/{{period}}>
 <h2>Свободное место на scratch</h2>

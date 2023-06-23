@@ -8,7 +8,7 @@
 <br/>
 
 %for key,value in data.items():
-<h2><a href="./group/{{value['link']}}">{{value['name']}}</a></h2>
+<h2><a href="./group/{{value['link']}}/">{{value['name']}}</a></h2>
 <table border=1>
 <tr>
 <th rowspan=2>№</th><th rowspan=2>IP</th><th rowspan=2>Hostname<br/>по DNS</th>
@@ -27,7 +27,7 @@
 %for i in value["values"]:
 <tr>
 <td>{{i[0]}}</td>
-<td><a href=./computer/{{i[2]}}>{{i[1]}}</a></td>
+<td><a href=./computer/{{i[2]}}/>{{i[1]}}</a></td>
 <td>{{i[2]}}</td>
 <td>{{i[3]}}</td>
 %import datetime

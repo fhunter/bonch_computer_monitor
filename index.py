@@ -64,8 +64,25 @@ def main():
 #    sessions_user_open=[]
 #    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False, period=period)
 
+@route('/last/<period:re:[d,w,m,y]>')
+@route('/last/')
+@view('last')
+def last_users(period = 'm'):
+    time = 0
+    if period == 'd':
+        time = 1
+    elif period == 'w':
+        time = 7
+    elif period == 'm':
+        time = 30
+    elif period == 'y':
+        time = 365
+    time = time * 24 * 60
+    users = db_exec_sql("select users,count() from users where (julianday('now')-julianday(time))*24*60 < ( ? ) group by users order by count() desc", (time, ) )
+    return dict(users=users, period = time)
+
 @route('/computer/<machine>/<period:re:[d,w,m,y]>')
-@route('/computer/<machine>')
+@route('/computer/<machine>/')
 @view('computer')
 def machinestats2(machine,period = 'w'):
     result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
@@ -81,7 +98,7 @@ def machinestats2(machine,period = 'w'):
     return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period=period)
 
 
-@route('/group/<grp>')
+@route('/group/<grp>/')
 @view('group')
 def machinestats(grp):
     if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
@@ -118,8 +135,12 @@ def graphs(hostname, typ, period = 'w'):
     result = "Error"
     if   typ == "uptime":
         result = rrd_uptime.graph(hostname, period)
-    elif typ == "cpu":
-        result = rrd_cpu.graph(hostname, period)
+    elif typ == "cpu1":
+        result = rrd_cpu.graph1(hostname, period)
+    elif typ == "cpu2":
+        result = rrd_cpu.graph2(hostname, period)
+    elif typ == "cpu3":
+        result = rrd_cpu.graph3(hostname, period)
     elif typ == "users":
         result = rrd_users.graph(hostname, period)
     elif typ == "scratch":
