@@ -2,6 +2,7 @@
 # coding=utf-8
 import datetime
 import time
+import glob
 import json
 import socket
 import os.path
@@ -20,6 +21,7 @@ import rrd_scratch
 import session_pc
 import settings
 
+bottle.debug(True)
 app = application = bottle.Bottle()
 
 @app.route(settings.PREFIX + '/')
@@ -77,7 +79,9 @@ def main():
     rooms = session.query(Room).all()
     computers = session.query(ComputerSession).all()
     computer = session.query(Computer).all()
-    return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer)
+    graphs = glob.glob('rrds/*_ansible.rrd')
+    graphs = [i.replace('rrds/','').replace('_ansible.rrd','') for i in graphs]
+    return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer, graphs=graphs)
 
 @app.route(settings.PREFIX +'/computer/<machine>/<period:re:[d,w,m,y]>')
 @app.route(settings.PREFIX +'/computer/<machine>')
@@ -129,7 +133,7 @@ def machinestats(grp):
 
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>')
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
-def graphs(hostname, typ, period = 'w'):
+def graphs_func(hostname, typ, period = 'w'):
     result = "Error"
     if   typ == "uptime":
         result = rrd_uptime.graph(hostname, period)
@@ -141,12 +145,14 @@ def graphs(hostname, typ, period = 'w'):
         result = rrd_cpu.graph3(hostname, period)
     elif typ == "users":
         result = rrd_users.graph(hostname, period)
+    elif typ == "lpu":
+        result = rrd_users.graph2(hostname, period)
     elif typ == "scratch":
         result = rrd_scratch.graph(hostname, period)
     elif typ == "ansible":
         result = rrd_ansible.graph(hostname, period)
     response.set_header('Content-type', 'image/png')
-    return str(result)
+    return result
 
 @app.route(settings.PREFIX +'/api/ansible', method='POST')
 def acceptansibledata():
@@ -183,6 +189,14 @@ def acceptdata():
     if hostname is None:
         hostname = socket.gethostbyaddr(ip_addr)[0]
     temp = (ip_addr, )
+    reportedhostname = request.json['hostname']
+    machineid = request.json['machineid']
+    uptime = request.json['uptime']
+    users = request.json['users']
+    cpu = request.json['cpu']
+    rrd_uptime.insert(hostname, [uptime, ])
+    rrd_cpu.insert(hostname, [cpu['load'], cpu['loadavg'], cpu['cores']])
+    rrd_users.insert(hostname, [len(set(users)),])
     res = db_exec_sql("select id from machines where ip = ?", temp)
     if len(res) == 0:
         temp = (ip_addr, hostname, )
@@ -191,15 +205,8 @@ def acceptdata():
         temp = (hostname, ip_addr, )
         db_exec_sql("update machines set hostname = ?, lastupdate = (DATETIME('now')) where ip = ?", temp)
     # here goes the report
-    reportedhostname = request.json['hostname']
-    uptime = request.json['uptime']
-    users = request.json['users']
-    cpu = request.json['cpu']
     db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip_addr, reportedhostname))
     db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip_addr, uptime))
-    rrd_uptime.insert(hostname, [uptime, ])
-    rrd_cpu.insert(hostname, [cpu['load'], cpu['loadavg'], cpu['cores']])
-    rrd_users.insert(hostname, [len(set(users)),])
     for i in users:
         db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
     return dict()

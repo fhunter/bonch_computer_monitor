@@ -15,6 +15,21 @@ def graph(hostname, period):
         )
     return test['image']
 
+def graph2(hostname, period):
+    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=CPU load per user %s" % hostname,
+        "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
+        "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
+        "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
+        "CDEF:users_m=users,UN,0,users,IF",
+        "CDEF:loadperuser1=load,users_m,/",
+        "CDEF:loadperuser=users_m,1,GE,loadperuser1,0,IF",
+#        "LINE2:usersa#00FFFF:Users average",
+        "LINE2:loadperuser#00FFFF:CPU load per user",
+        "CDEF:unavailable=users,UN,INF,0,IF",
+        "AREA:unavailable#f0f0f0",
+        )
+    return test['image']
+
 def insert(hostname, data, timestamp="N"):
     if not exists(hostname):
         create(hostname)
