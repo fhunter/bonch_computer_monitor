@@ -1,8 +1,10 @@
 import os
 import rrdtool
 from period import period_conv
+from functools import lru_cache
 
 
+@lru_cache(maxsize=128)
 def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % hostname,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
@@ -17,6 +19,7 @@ def insert(hostname, data, timestamp="N"):
         create(hostname)
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     rrdtool.update(rrdname, '%s:%s' % (timestamp, data[0]))
+    graph.cache_clear()
 
 def exists(hostname):
     rrdname = "rrds/" + hostname + "_uptime.rrd"

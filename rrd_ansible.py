@@ -1,8 +1,10 @@
 import os
 import rrdtool
 from period import period_conv
+from functools import lru_cache
 
 
+@lru_cache(maxsize=128)
 def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Ansible %s" % hostname,
                           "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname),
@@ -23,6 +25,7 @@ def insert(hostname, data, timestamp="N"):
         create(hostname)
     rrdname = "rrds/" + hostname + "_ansible.rrd"
     rrdtool.update(rrdname, '%s:%s:%s:%s:%s' % (timestamp, data[0], data[1], data[2], data[3]))
+    graph.cache_clear()
 
 def exists(hostname):
     rrdname = "rrds/" + hostname + "_ansible.rrd"

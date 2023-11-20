@@ -1,6 +1,7 @@
 import rrdtool
 import os
 from period import period_conv
+from functools import lru_cache
 
 #rrdtool create termserver2_scratch.rrd \
 #    --start $(date +%s --date="-2years") \
@@ -20,6 +21,7 @@ from period import period_conv
 #    RRA:LAST:0.5:6:1200 \
 #    RRA:LAST:0.5:24:1200
 
+@lru_cache(maxsize=128)
 def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=/scratch %s" % hostname,
                         "DEF:free=rrds/%s_scratch.rrd:free:LAST" % (hostname) ,
@@ -36,6 +38,7 @@ def insert(hostname, data, timestamp = "N"):
         create(hostname)
     rrdname = "rrds/" + hostname + "_scratch.rrd"
     rrdtool.update(rrdname, '%s:%s:%s' % (timestamp,data[0],data[1]))
+    graph.cache_clear()
 
 def exists(hostname):
     rrdname = "rrds/" + hostname + "_scratch.rrd"

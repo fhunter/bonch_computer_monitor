@@ -1,7 +1,9 @@
 import os
 import rrdtool
 from period import period_conv
+from functools import lru_cache
 
+@lru_cache(maxsize=128)
 def graph(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=User count %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
@@ -15,6 +17,7 @@ def graph(hostname, period):
         )
     return test['image']
 
+@lru_cache(maxsize=128)
 def graph2(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=CPU load per user %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
@@ -35,6 +38,8 @@ def insert(hostname, data, timestamp="N"):
         create(hostname)
     rrdname = "rrds/" + hostname + "_users.rrd"
     rrdtool.update(rrdname, '%s:%s' % (timestamp, data[0], ))
+    graph.cache_clear()
+    graph2.cache_clear()
 
 def exists(hostname):
     rrdname = "rrds/" + hostname + "_users.rrd"

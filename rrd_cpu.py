@@ -1,6 +1,7 @@
 import os
 import rrdtool
 from period import period_conv
+from functools import lru_cache
 
 #rrdtool create termserver2_cpu.rrd \
 #    --start $(date +%s --date="-2years") \
@@ -21,6 +22,7 @@ from period import period_conv
 #    RRA:LAST:0.5:6:1200 \
 #    RRA:LAST:0.5:24:1200
 
+@lru_cache(maxsize=128)
 def graph1(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
@@ -31,6 +33,7 @@ def graph1(hostname, period):
                          )
     return test['image']
 
+@lru_cache(maxsize=128)
 def graph2(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
@@ -40,6 +43,7 @@ def graph2(hostname, period):
                          )
     return test['image']
 
+@lru_cache(maxsize=128)
 def graph3(hostname, period):
     test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),
@@ -54,6 +58,9 @@ def insert(hostname, data, timestamp="N"):
         create(hostname)
     rrdname = "rrds/" + hostname + "_cpu.rrd"
     rrdtool.update(rrdname, '%s:%s:%s:%s' % (timestamp, data[0], data[1], data[2]))
+    graph1.cache_clear()
+    graph2.cache_clear()
+    graph3.cache_clear()
 
 def exists(hostname):
     rrdname = "rrds/" + hostname + "_cpu.rrd"
