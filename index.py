@@ -137,6 +137,7 @@ def machinestats(grp):
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
 def graphs_func(hostname, typ, period = 'w'):
     result = "Error"
+    age = 1000 # 16 minutes
     if   typ == "uptime":
         result = rrd_uptime.graph(hostname, period)
     elif typ == "cpu1":
@@ -147,13 +148,16 @@ def graphs_func(hostname, typ, period = 'w'):
         result = rrd_cpu.graph3(hostname, period)
     elif typ == "users":
         result = rrd_users.graph(hostname, period)
+        age = 200 # 3 minutes
     elif typ == "lpu":
         result = rrd_users.graph2(hostname, period)
+        age = 200 # 3 minutes
     elif typ == "scratch":
         result = rrd_scratch.graph(hostname, period)
     elif typ == "ansible":
         result = rrd_ansible.graph(hostname, period)
     response.set_header('Content-type', 'image/png')
+    response.set_header('Cache-control', 'max-age=%s,public' % age)
     return result
 
 @app.route(settings.PREFIX +'/api/ansible', method='POST')
