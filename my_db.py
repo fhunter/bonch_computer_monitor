@@ -30,8 +30,8 @@ class Computer(Base):
     room = Column(Integer, ForeignKey('room.id'))
 
     def __repr__(self):
-        return "<Computer(hostname='%s' machineid='%s' last_report='%s' ip='%s' room='%s')>" % (
-            self.hostname, self.machineid, self.last_report, self.ip, self.room)
+        return "<Computer(hostname='%s' machineid='%s' first_report='%s' last_report='%s' ip='%s' room='%s')>" % (
+            self.hostname, self.machineid, self.first_report, self.last_report, self.ip, self.room)
 
 class Uptime(Base):
     __tablename__ = 'uptime'
