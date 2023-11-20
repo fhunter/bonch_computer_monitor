@@ -5,7 +5,7 @@
 {{i}} </br>
 %end
 <h1>Комнаты</h1>
-%for i in rooms
+%for i in rooms:
 {{i}}</br>
 %end
 <h1>Сессии компьютеров</h1>
