@@ -1,13 +1,21 @@
 <html>
 <body>
 <h1>Пользовательские сессии</h1>
-{{users}} </br>
+%for i in users:
+{{i}} </br>
+%end
 <h1>Комнаты</h1>
-{{rooms}}
+%for i in rooms
+{{i}}</br>
+%end
 <h1>Сессии компьютеров</h1>
-{{computers}}
+%for i in computers:
+{{i}}</br>
+%end
 <h1>Компьютеры</h1>
-{{computer}}
+%for i in computer:
+{{i}} </br>
+%end
 <h1>Графики ansible</h1>
 %for i in graphs:
 <h2>{{i}}</h2>
