@@ -19,6 +19,7 @@ import rrd_ansible
 import rrd_scratch
 
 import session_pc
+import computer
 import settings
 
 bottle.debug(True)
@@ -42,7 +43,7 @@ def main():
     displaydata = {}
     for i in rooms:
         displaydata[i] = {}
-        displaydata[i]['name'] = u"Аудитория "+i.name
+        displaydata[i]['name'] = i.name
         displaydata[i]['link'] = i.name
         displaydata[i]['online'] = 0
         room = (i, )
@@ -197,6 +198,7 @@ def acceptdata():
     rrd_uptime.insert(hostname, [uptime, ])
     rrd_cpu.insert(hostname, [cpu['load'], cpu['loadavg'], cpu['cores']])
     rrd_users.insert(hostname, [len(set(users)),])
+    computer.add_or_update(session, machineid, ip_addr, reportedhostname)
     res = db_exec_sql("select id from machines where ip = ?", temp)
     if len(res) == 0:
         temp = (ip_addr, hostname, )
@@ -213,5 +215,6 @@ def acceptdata():
 
 if __name__ == '__main__':
     bottle.run(app,
-        host='0.0.0.0',
-        port=8080)
+        host='127.0.0.1',
+        port=8086,
+        reloader=True)
