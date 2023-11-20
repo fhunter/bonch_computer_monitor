@@ -198,20 +198,22 @@ def acceptdata():
     rrd_uptime.insert(hostname, [uptime, ])
     rrd_cpu.insert(hostname, [cpu['load'], cpu['loadavg'], cpu['cores']])
     rrd_users.insert(hostname, [len(set(users)),])
+    session = Session()
     computer.add_or_update(session, machineid, ip_addr, reportedhostname)
-    res = db_exec_sql("select id from machines where ip = ?", temp)
-    if len(res) == 0:
-        temp = (ip_addr, hostname, )
-        db_exec_sql("insert into machines ( ip, hostname, lastupdate ) values ( ?, ?, (DATETIME('now')))", temp)
-    else:
-        temp = (hostname, ip_addr, )
-        db_exec_sql("update machines set hostname = ?, lastupdate = (DATETIME('now')) where ip = ?", temp)
-    # here goes the report
-    db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip_addr, reportedhostname))
-    db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip_addr, uptime))
-    for i in users:
-        db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
     return dict()
+#    res = db_exec_sql("select id from machines where ip = ?", temp)
+#    if len(res) == 0:
+#        temp = (ip_addr, hostname, )
+#        db_exec_sql("insert into machines ( ip, hostname, lastupdate ) values ( ?, ?, (DATETIME('now')))", temp)
+#    else:
+#        temp = (hostname, ip_addr, )
+#        db_exec_sql("update machines set hostname = ?, lastupdate = (DATETIME('now')) where ip = ?", temp)
+#    # here goes the report
+#    db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip_addr, reportedhostname))
+#    db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip_addr, uptime))
+#    for i in users:
+#        db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
+#    return dict()
 
 if __name__ == '__main__':
     bottle.run(app,
