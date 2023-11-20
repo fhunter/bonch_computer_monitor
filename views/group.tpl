@@ -1,5 +1,5 @@
 %include header_graphs
-<h1>Графики для группы </h1>
+<h1>Графики для группы {{attr}}</h1>
 
 <table border=1>
 <thead>

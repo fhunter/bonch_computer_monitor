@@ -7,7 +7,7 @@ import json
 import socket
 import os.path
 import bottle
-from bottle import route, view, request, response
+from bottle import route, view, request, response, redirect
 from my_db import db_exec_sql
 from my_db import Session, Room, UserSession, ComputerSession, Computer
 import usage
@@ -104,11 +104,12 @@ def machinestats2(machine,period = 'w'):
 @app.route(settings.PREFIX +'/group/<grp>')
 @view('group')
 def machinestats(grp):
-    if grp in ['a425', 'a437', 'a439', 'a441', 'a443', 'a445', 'misc']:
-        if grp == 'misc':
-            result = db_exec_sql("select hostname,ip from machines where room is NULL order by hostname")
-        else:
-            result = db_exec_sql("select hostname,ip from machines where room = ? order by hostname", (grp,))
+    session = Session()
+    room  = session.query(Room).filter(Room.name == grp).first()
+    result = []
+    if not room:
+        redirect(settings.PREFIX + "/")
+#            result = db_exec_sql("select hostname,ip from machines where room = ? order by hostname", (grp,))
     tabs = []
     recipes = {}
     popularity = {}
@@ -130,7 +131,7 @@ def machinestats(grp):
             tabs.append(temp)
     tabs2 = json.dumps(tabs)
     recipes2 = json.dumps(recipes)
-    return dict(date=datetime.datetime.now(), hosts=result, popularity=popularity, tabs=tabs2, recipes=recipes2, attr=grp, group=True)
+    return dict(date=datetime.datetime.now(), hosts=result, popularity=popularity, tabs=tabs2, recipes=recipes2, attr=room.name, group=True)
 
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>')
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
