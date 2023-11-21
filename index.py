@@ -54,7 +54,7 @@ def main():
 #        else:
 #            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
         temp = []
-        result = session.query(Computer).filter(Computer.room == i.id).all()
+        result = session.query(Computer).filter(Computer.room == i.id).order_by(Computer.hostname).all()
 # 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room
         for record in result:
             hostname = record.hostname
