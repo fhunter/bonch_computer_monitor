@@ -45,7 +45,7 @@ def getusage(period,ip):
 #    #result = db_exec_sql("select count() from users where (ip = ?) and (julianday('now') - julianday(time)) <= ? group by time",(ip, period))
 #    result = db_exec_sql("select count() from users where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
 #    return result[0][0]*5
-    return NaN
+    return 0
 
 def getansible(hostname):
     #CREATE TABLE ansible (id integer primary key autoincrement not null, hostname text, time datetime not null, ok integer not null, change integer not null, unreachable integer not null, failed integer not null);
@@ -71,5 +71,5 @@ def getpowered(period,ip):
     #FIXME
 #    result = db_exec_sql("select count() from uptime where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
 #    return result[0][0]*5
-    return NaN
+    return 0
 
