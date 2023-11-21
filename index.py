@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
 import datetime
-import time
 import glob
 import json
 import socket
@@ -47,15 +46,12 @@ def main():
         displaydata[i]['name'] = i.name
         displaydata[i]['link'] = i.name
         displaydata[i]['online'] = 0
-#        room = (i, )
-#        if i == 'misc':
-#            displaydata[i]['name'] = u"Прочее"
-#            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room is NULL order by hostname")
-#        else:
-#            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
         temp = []
-        result = session.query(Computer).filter(Computer.room == i.id).order_by(Computer.hostname).all()
-# 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room
+        result = (session.query(Computer)
+                 .filter(Computer.room == i.id)
+                 .order_by(Computer.hostname)
+                 .all())
+        # 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room
         for record in result:
             hostname = record.hostname
             if not hostname.endswith('.dcti.sut.ru'):
@@ -64,7 +60,12 @@ def main():
             scratch = rrd_scratch.latest(hostname)
             time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
             temptuple = (record.id, record.ip, hostname, record.last_report, time_since_update)
-            temptuple = temptuple + (usage.getpowered(30, record.ip), usage.getusage(30, record.ip), ansible, scratch, 'NaN')
+            temptuple = temptuple + (usage.getpowered(30, record.ip),
+                                     usage.getusage(30, record.ip),
+                                     ansible,
+                                     scratch,
+                                     'NaN',
+                                     record.machineid)
             temp.append(temptuple)
         displaydata[i]['values'] = temp
         displaydata[i]['total'] = len(result)

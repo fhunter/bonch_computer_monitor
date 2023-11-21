@@ -27,7 +27,7 @@
 %for i in value["values"]:
 <tr>
 <td>{{i[0]}}</td>
-<td><a href=./computer/{{i[2]}}>{{i[1]}}</a></td>
+<td><a href=./computer/{{i[10]}}>{{i[1]}}</a></td>
 <td>{{i[2]}}</td>
 <td>{{i[3]}}</td>
 %import datetime
