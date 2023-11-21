@@ -114,27 +114,33 @@ def machinestats2(machine,period = 'w'):
 def machinestats(grp):
     session = Session()
     room  = session.query(Room).filter(Room.name == grp).first()
-    result = []
     if not room:
         redirect(settings.PREFIX + "/")
+    result = session.query(Computer).filter(Computer.room == room.id).all()
 #            result = db_exec_sql("select hostname,ip from machines where room = ? order by hostname", (grp,))
     tabs = []
     recipes = {}
     popularity = {}
     for i in result:
-        popularity[i[0]] = {}
+        hostname = i.hostname
+        if not hostname.endswith('.dcti.sut.ru'):
+            hostname = hostname + '.dcti.sut.ru'
+        popularity[hostname] = {}
         for j in [7, 14, 30, 60, 90, 180]:
-            popularity[i[0]][j] = usage.getpopularity(j, i[1])
+            popularity[hostname][j] = usage.getpopularity(j, i.machineid)
     for i in result:
-        if os.path.isdir("/var/www/rrds/"+i[0]):
+        hostname = i.hostname
+        if not hostname.endswith('.dcti.sut.ru'):
+            hostname = hostname + '.dcti.sut.ru'
+        if os.path.isdir("/var/www/rrds/"+hostname):
             temp = []
-            temp.append(i[0])
+            temp.append(hostname)
             temp2 = []
             for j in ["cpu", "memory", "load", "users", "uptime"]:
-                recipe_name = i[0]+"_"+j
+                recipe_name = hostname+"_"+j
                 temp2.append(recipe_name)
                 recipes[recipe_name] = {}
-                recipes[recipe_name]["title"] = j + " on " + i[0]
+                recipes[recipe_name]["title"] = j + " on " + hostname
             temp.append(temp2)
             tabs.append(temp)
     tabs2 = json.dumps(tabs)

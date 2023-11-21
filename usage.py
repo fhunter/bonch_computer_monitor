@@ -36,8 +36,10 @@ def getpopularity(period, ip):
         period - в днях
         возвращает массив из пар время в минутах, пользователь
     """
-    result = db_exec_sql("select users,count()*5 from users where (ip = ? ) and (julianday('now') - julianday(time)) <= ? group by users", (ip, period))
-    return result
+#    result = db_exec_sql("select users,count()*5 from users where (ip = ? ) and (julianday('now') - julianday(time)) <= ? group by users", (ip, period))
+#    return result
+# FIXME
+    return []
 
 def getusage(period,ip):
     """ Использование компьютера за определённый период """
