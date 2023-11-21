@@ -92,20 +92,20 @@ def debugfunc():
     graphs = [i.replace('rrds/','').replace('_ansible.rrd','') for i in graphs]
     return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer_list, graphs=graphs)
 
-@app.route(settings.PREFIX +'/computer/<machine>/<period:re:[d,w,m,y]>')
-@app.route(settings.PREFIX +'/computer/<machine>')
+@app.route(settings.PREFIX +'/computer/<machineid>/<period:re:[d,w,m,y]>')
+@app.route(settings.PREFIX +'/computer/<machineid>')
 @view('computer')
-def machinestats2(machine,period = 'w'):
-    result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
-    if len(result) > 0:
-        ip_addr = result[0][1]
-        result = result[0][0]
-    else:
-        result = None
-        ip_addr = ""
+def machinestats2(machineid,period = 'w'):
+    session = Session()
+#    result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
+    result = session.query(Computer).filter(Computer.machineid == machineid).first()
+    if not result:
+        redirect(settings.PREFIX + "/")
+    ip_addr = result.ip
+    result = result.hostname
     popularity = {}
     for j in [7, 14, 30, 60, 90, 180]:
-        popularity[j] = usage.getpopularity(j, ip_addr)
+        popularity[j] = usage.getpopularity(j, ip_addr) #FIXME
     return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period=period)
 
 
@@ -117,7 +117,6 @@ def machinestats(grp):
     if not room:
         redirect(settings.PREFIX + "/")
     result = session.query(Computer).filter(Computer.room == room.id).order_by(Computer.hostname).all()
-#            result = db_exec_sql("select hostname,ip from machines where room = ? order by hostname", (grp,))
     tabs = []
     recipes = {}
     popularity = {}
