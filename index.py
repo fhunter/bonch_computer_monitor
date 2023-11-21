@@ -106,7 +106,7 @@ def machinestats2(machineid,period = 'w'):
     popularity = {}
     for j in [7, 14, 30, 60, 90, 180]:
         popularity[j] = usage.getpopularity(j, ip_addr) #FIXME
-    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machine, group=False, period=period)
+    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machineid, group=False, period=period)
 
 
 @app.route(settings.PREFIX +'/group/<grp>')
