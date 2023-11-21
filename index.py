@@ -125,9 +125,9 @@ def machinestats(grp):
         hostname = i.hostname
         if not hostname.endswith('.dcti.sut.ru'):
             hostname = hostname + '.dcti.sut.ru'
-        popularity[hostname] = {}
+        popularity[i.hostname] = {}
         for j in [7, 14, 30, 60, 90, 180]:
-            popularity[hostname][j] = usage.getpopularity(j, i.machineid)
+            popularity[i.hostname][j] = usage.getpopularity(j, i.machineid)
     for i in result:
         hostname = i.hostname
         if not hostname.endswith('.dcti.sut.ru'):

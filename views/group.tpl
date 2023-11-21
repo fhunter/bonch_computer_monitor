@@ -18,7 +18,7 @@
 %for i in hosts:
 <tr>
 <td>
-{{i[0]}}
+{{i.hostname}}
 </td>
 %for j in [7,14,30,60,90,180]:
 <td valign=top>
@@ -28,8 +28,8 @@
 	<th>Пользователь</th><th>минуты</th>
 	<tr>
 	</thead>
-	%popularity[i[0]][j].sort(reverse=True,key=myfunc)
-	%for k in popularity[i[0]][j]:
+	%popularity[i.hostname][j].sort(reverse=True,key=myfunc)
+	%for k in popularity[i.hostname][j]:
 	<tr>
 	<td>{{k[0]}}</td><td>{{k[1]}}</td>
 	</tr>
