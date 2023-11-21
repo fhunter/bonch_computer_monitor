@@ -60,7 +60,7 @@ def main():
             ansible = rrd_ansible.latest(str(record.hostname))
             scratch = rrd_scratch.latest(str(record.hostname))
             time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
-            temptuple = (record.ip, record.hostname, record.last_report, time_since_update, record.room)
+            temptuple = (record.id, record.ip, record.hostname, record.last_report, time_since_update, record.room)
             temptuple = temptuple + (usage.getpowered(30, record.ip), usage.getusage(30, record.ip), ansible, scratch, 'NaN')
             temp.append(temptuple)
         displaydata[i]['values'] = temp
