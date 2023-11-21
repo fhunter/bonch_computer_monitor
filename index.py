@@ -102,11 +102,13 @@ def machinestats2(machineid,period = 'w'):
     if not result:
         redirect(settings.PREFIX + "/")
     ip_addr = result.ip
-    result = result.hostname
+    hostname = resutl.hostname
+    if not hostname.endswith('.dcti.sut.ru'):
+        hostname = hostname + '.dcti.sut.ru'
     popularity = {}
     for j in [7, 14, 30, 60, 90, 180]:
         popularity[j] = usage.getpopularity(j, ip_addr) #FIXME
-    return dict(date=datetime.datetime.now(), machine=result, popularity=popularity, attr=machineid, group=False, period=period)
+    return dict(date=datetime.datetime.now(), machine=hostname, popularity=popularity, attr=machineid, group=False, period=period)
 
 
 @app.route(settings.PREFIX +'/group/<grp>')
