@@ -8,11 +8,15 @@
 <img src={{settings.PREFIX}}/graph/{{machine}}_cpu2/{{period}}><br/>
 <img src={{settings.PREFIX}}/graph/{{machine}}_cpu3/{{period}}>
 <h2>Количество пользователей</h2>
-<img src={{settings.PREFIX}}/graph/{{machine}}_users/{{period}}>
+<img src={{settings.PREFIX}}/graph/{{machine}}_users/{{period}}><br/>
+<img src={{settings.PREFIX}}/graph/{{machine}}_lpu/{{period}}>
 <h2>Свободное место на scratch</h2>
 <img src={{settings.PREFIX}}/graph/{{machine}}_scratch/{{period}}>
 <h2>Статус ansible</h2>
 <img src={{settings.PREFIX}}/graph/{{machine}}_ansible/{{period}}>
+<h2>Время работы</h2>
+<img src={{settings.PREFIX}}/graph/{{machine}}_uptime/{{period}}>
+
 
 <table border=1 width=75%>
 <thead>
