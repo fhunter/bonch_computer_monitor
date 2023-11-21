@@ -30,7 +30,7 @@ def main():
     session = Session()
     onlinecount = session.query(ComputerSession).filter(ComputerSession.session_end==None).count()
     usersloggedin = session.query(UserSession).filter(UserSession.session_end==None).all()
-    rooms = session.query(Room).all()
+    rooms = session.query(Room).order_by(Room.name).all()
     userslog = dict()
 #    for i in usersloggedin:
 #        if i[0] in userslog:
