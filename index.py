@@ -57,12 +57,12 @@ def main():
         result = session.query(Computer).filter(Computer.room == i.id).all()
 # 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room
         for record in result:
-            ansible = rrd_ansible.latest(str(record.hostname))
-            scratch = rrd_scratch.latest(str(record.hostname))
-            time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
             hostname = record.hostname
             if not hostname.endswith('.dcti.sut.ru'):
                 hostname = hostname + '.dcti.sut.ru'
+            ansible = rrd_ansible.latest(str(record.hostname))
+            scratch = rrd_scratch.latest(str(record.hostname))
+            time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
             temptuple = (record.id, record.ip, record.hostname, record.last_report, time_since_update, record.room)
             temptuple = temptuple + (usage.getpowered(30, record.ip), usage.getusage(30, record.ip), ansible, scratch, 'NaN')
             temp.append(temptuple)
