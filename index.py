@@ -116,7 +116,7 @@ def machinestats(grp):
     room  = session.query(Room).filter(Room.name == grp).first()
     if not room:
         redirect(settings.PREFIX + "/")
-    result = session.query(Computer).filter(Computer.room == room.id).all()
+    result = session.query(Computer).filter(Computer.room == room.id).order_by(Computer.hostname).all()
 #            result = db_exec_sql("select hostname,ip from machines where room = ? order by hostname", (grp,))
     tabs = []
     recipes = {}
