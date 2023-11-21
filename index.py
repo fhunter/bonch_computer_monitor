@@ -102,7 +102,7 @@ def machinestats2(machineid,period = 'w'):
     if not result:
         redirect(settings.PREFIX + "/")
     ip_addr = result.ip
-    hostname = resutl.hostname
+    hostname = result.hostname
     if not hostname.endswith('.dcti.sut.ru'):
         hostname = hostname + '.dcti.sut.ru'
     popularity = {}
