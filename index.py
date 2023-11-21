@@ -41,23 +41,27 @@ def main():
 #            userslog[i[0]] = i[1]
 #    onlinecount = online[0][0]
     displaydata = {}
+    timenow = datetime.datetime.now()
     for i in rooms:
         displaydata[i] = {}
         displaydata[i]['name'] = i.name
         displaydata[i]['link'] = i.name
         displaydata[i]['online'] = 0
-        room = (i, )
+#        room = (i, )
 #        if i == 'misc':
 #            displaydata[i]['name'] = u"Прочее"
 #            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room is NULL order by hostname")
 #        else:
 #            result = db_exec_sql("select id, ip, hostname, lastupdate, (julianday('now')-julianday(lastupdate))*24*60 from machines where room = ? order by hostname", room)
         temp = []
-        result = []
+        result = session.query(Computer).filter(Computer.room == i.id).all()
+# 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room
         for record in result:
-            ansible = rrd_ansible.latest(str(record[2]))
-            scratch = rrd_scratch.latest(str(record[2]))
-            temptuple = record + (usage.getpowered(30, record[1]), usage.getusage(30, record[1]), ansible, scratch, 'NaN')
+            ansible = rrd_ansible.latest(str(record.hostname))
+            scratch = rrd_scratch.latest(str(record.hostname))
+            time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
+            temptuple = (record.ip, record.hostname, record.last_report, time_since_update, record.room)
+            temptuple = temptuple + (usage.getpowered(30, record.ip), usage.getusage(30, record.ip), ansible, scratch, 'NaN')
             temp.append(temptuple)
         displaydata[i]['values'] = temp
         displaydata[i]['total'] = len(result)
@@ -74,15 +78,15 @@ def main():
 
 @app.route(settings.PREFIX + '/debug/')
 @view('debug')
-def main():
+def debugfunc():
     session = Session()
     usersloggedin = session.query(UserSession).all()
     rooms = session.query(Room).all()
     computers = session.query(ComputerSession).all()
-    computer = session.query(Computer).all()
+    computer_list = session.query(Computer).all()
     graphs = glob.glob('rrds/*_ansible.rrd')
     graphs = [i.replace('rrds/','').replace('_ansible.rrd','') for i in graphs]
-    return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer, graphs=graphs)
+    return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer_list, graphs=graphs)
 
 @app.route(settings.PREFIX +'/computer/<machine>/<period:re:[d,w,m,y]>')
 @app.route(settings.PREFIX +'/computer/<machine>')
@@ -194,7 +198,7 @@ def acceptdata():
     hostname = request.environ.get("REMOTE_HOST")
     if hostname is None:
         hostname = socket.gethostbyaddr(ip_addr)[0]
-    temp = (ip_addr, )
+#    temp = (ip_addr, )
     reportedhostname = request.json['hostname']
     machineid = request.json['machineid']
     uptime = request.json['uptime']
