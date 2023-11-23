@@ -6,8 +6,7 @@ import json
 import socket
 import os.path
 import bottle
-from bottle import route, view, request, response, redirect
-from my_db import db_exec_sql
+from bottle import view, request, response, redirect
 from my_db import Session, Room, UserSession, ComputerSession, Computer
 import usage
 
@@ -28,8 +27,10 @@ app = application = bottle.Bottle()
 @view('mainpage')
 def main():
     session = Session()
-    onlinecount = session.query(ComputerSession).filter(ComputerSession.session_end==None).count()
-    usersloggedin = session.query(UserSession).filter(UserSession.session_end==None).all()
+    onlinecount = (session.query(ComputerSession)
+                  .filter(ComputerSession.session_end.is_(None))
+                  .count())
+    usersloggedin = session.query(UserSession).filter(UserSession.session_end.is_(None)).all()
     rooms = session.query(Room).order_by(Room.name).all()
     userslog = dict()
 #    for i in usersloggedin:
@@ -69,7 +70,10 @@ def main():
             temp.append(temptuple)
         displaydata[i]['values'] = temp
         displaydata[i]['total'] = len(result)
-    return dict(data=displaydata, date=datetime.datetime.now(), online=onlinecount, userslog=userslog)
+    return dict(data=displaydata,
+                date=datetime.datetime.now(),
+                online=onlinecount,
+                userslog=userslog)
 
 @app.route(settings.PREFIX + '/debug/')
 @view('debug')
@@ -81,7 +85,11 @@ def debugfunc():
     computer_list = session.query(Computer).all()
     graphs = glob.glob('rrds/*_ansible.rrd')
     graphs = [i.replace('rrds/','').replace('_ansible.rrd','') for i in graphs]
-    return dict(users=usersloggedin, rooms= rooms, computers=computers, computer = computer_list, graphs=graphs)
+    return dict(users=usersloggedin,
+                rooms= rooms,
+                computers=computers,
+                computer = computer_list,
+                graphs=graphs)
 
 @app.route(settings.PREFIX +'/computer/<machineid>/<period:re:[d,w,m,y]>')
 @app.route(settings.PREFIX +'/computer/<machineid>')
@@ -99,7 +107,12 @@ def machinestats2(machineid,period = 'w'):
     popularity = {}
     for j in [7, 14, 30, 60, 90, 180]:
         popularity[j] = usage.getpopularity(j, ip_addr) #FIXME
-    return dict(date=datetime.datetime.now(), machine=hostname, popularity=popularity, attr=machineid, group=False, period=period)
+    return dict(date=datetime.datetime.now(),
+                machine=hostname,
+                popularity=popularity,
+                attr=machineid,
+                group=False,
+                period=period)
 
 
 @app.route(settings.PREFIX +'/group/<grp>')
@@ -109,7 +122,10 @@ def machinestats(grp):
     room  = session.query(Room).filter(Room.name == grp).first()
     if not room:
         redirect(settings.PREFIX + "/")
-    result = session.query(Computer).filter(Computer.room == room.id).order_by(Computer.hostname).all()
+    result = (session.query(Computer)
+             .filter(Computer.room == room.id)
+             .order_by(Computer.hostname)
+             .all())
     tabs = []
     recipes = {}
     popularity = {}
@@ -137,7 +153,13 @@ def machinestats(grp):
             tabs.append(temp)
     tabs2 = json.dumps(tabs)
     recipes2 = json.dumps(recipes)
-    return dict(date=datetime.datetime.now(), hosts=result, popularity=popularity, tabs=tabs2, recipes=recipes2, attr=room.name, group=True)
+    return dict(date=datetime.datetime.now(),
+                hosts=result,
+                popularity=popularity,
+                tabs=tabs2,
+                recipes=recipes2,
+                attr=room.name,
+                group=True)
 
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>')
 @app.route(settings.PREFIX +'/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')

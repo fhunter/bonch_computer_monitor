@@ -3,10 +3,9 @@
 
 """ Database access abstraction module """
 
-import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.sql import func
 
@@ -30,7 +29,10 @@ class Computer(Base):
     room = Column(Integer, ForeignKey('room.id'))
 
     def __repr__(self):
-        return "<Computer(hostname='%s' machineid='%s' first_report='%s' last_report='%s' ip='%s' room='%s')>" % (
+        tmpl = "<Computer(hostname='%s' machineid='%s' "
+        tmpl = tmpl + "first_report='%s' last_report='%s' "
+        tmpl = tmpl + "ip='%s' room='%s')>"
+        return tmpl % (
             self.hostname, self.machineid, self.first_report, self.last_report, self.ip, self.room)
 
 class Uptime(Base):

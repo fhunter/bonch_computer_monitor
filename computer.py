@@ -4,6 +4,7 @@ import datetime
 from my_db import Computer, Room
 
 def add(db_session, machineid, ip_addr, reportedhostname):
+    """ Register computer in database by machineid, ip and hostname """
     computer = (db_session.query(Computer)
                .filter(Computer.machineid == machineid)
                .filter(Computer.ip == ip_addr)
@@ -22,7 +23,7 @@ def add(db_session, machineid, ip_addr, reportedhostname):
         db_session.commit()
 
 def update(db_session, machineid, ip_addr, reportedhostname):
-    """ Register computer in database by machineid, ip and hostname """
+    """ Update computer's record in database by machineid, ip and hostname """
     computer = (db_session.query(Computer)
                .filter(Computer.machineid == machineid)
                .filter(Computer.ip == ip_addr)
