@@ -11,8 +11,9 @@ def get_sessions(db_session, machineid, start, end):
 def clean_sessions(db_session): # check if any sessions are stale
     time = datetime.datetime.now()
     # find all computers with more than 10 minutes since last report
+    timedelta = datetime.timedelta(minutes = 10)
     computers = (db_session.query(Computer)
-                .filter((time - Computer.last_report).total_seconds() >= 10*60)
+                .filter((time - Computer.last_report) >= timedelta)
                 .all())
     for i in computers:
         sessions = (db_session.query(ComputerSession)
@@ -40,11 +41,13 @@ def update_session(db_session, machineid, uptime):
     # 1.2. закрыть открытые по времени последнего отчёта, создать новую.
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     time = datetime.datetime.now()
-    session = (db_session(ComputerSession)
+    uptimedelta_p = datetime.timedelta(seconds = uptime + 2.5*60)
+    uptimedelta_n = datetime.timedelta(seconds = uptime - 2.5*60)
+    session = (db_session.query(ComputerSession)
               .filter(ComputerSession.computer == computer.id)
-              .filter((time - ComputerSession.session_start).total_seconds() < (uptime + 2.5*60))
-              .filter((time - ComputerSession.session_start).total_seconds() > (uptime - 2.5*60))
-              .last())
+              .filter((time - ComputerSession.session_start) < uptimedelta_p)
+              .filter((time - ComputerSession.session_start) > uptimedelta_n)
+              .first())
     if session:
         # Сессия существует, продлеваем/переоткрываем
         session.session_end = None
@@ -52,6 +55,6 @@ def update_session(db_session, machineid, uptime):
         # Сессии нет. Закрываем все, добавляем новую
         close_session(db_session, machineid)
         start = time - datetime.timedelta(seconds = uptime)
-        session = ComputerSession(session_start = start, computer = computer)
+        session = ComputerSession(session_start = start, computer = computer.id)
         db_session.add(session)
     db_session.commit()
