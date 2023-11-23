@@ -13,7 +13,7 @@ def clean_sessions(db_session): # check if any sessions are stale
     # find all computers with more than 10 minutes since last report
     timedelta = datetime.timedelta(minutes = 10)
     computers = (db_session.query(Computer)
-                .filter((time - Computer.last_report) >= timedelta)
+                .filter(Computer.last_report <= (time - timedelta))
                 .all())
     for i in computers:
         sessions = (db_session.query(ComputerSession)
@@ -45,8 +45,8 @@ def update_session(db_session, machineid, uptime):
     uptimedelta_n = datetime.timedelta(seconds = uptime - 2.5*60)
     session = (db_session.query(ComputerSession)
               .filter(ComputerSession.computer == computer.id)
-              .filter((time - ComputerSession.session_start) < uptimedelta_p)
-              .filter((time - ComputerSession.session_start) > uptimedelta_n)
+              .filter(ComputerSession.session_start.between(time - uptimedelta_p,
+                                                            time - uptimedelta_n))
               .first())
     if session:
         # Сессия существует, продлеваем/переоткрываем
