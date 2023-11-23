@@ -27,6 +27,7 @@ app = application = bottle.Bottle()
 @view('mainpage')
 def main():
     session = Session()
+    session_pc.clean_sessions(session)
     onlinecount = (session.query(ComputerSession)
                   .filter(ComputerSession.session_end.is_(None))
                   .count())
