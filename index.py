@@ -71,15 +71,6 @@ def main():
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata, date=datetime.datetime.now(), online=onlinecount, userslog=userslog)
 
-#@app.route(settings.PREFIX +'/computer2/<machine>/<period:re:[d,w,m,y]>')
-#@app.route(settings.PREFIX +'/computer2/<machine>')
-#@view('computer2')
-#def machinestats3(machine,period = 'w'):
-#    sessions_pc=session_pc.get_sessions(machine, time.time()-30*24*60*60, None)
-#    sessions_user=[]
-#    sessions_user_open=[]
-#    return dict(date=datetime.datetime.now(), machine=machine, sessions_pc=sessions_pc, sessions_user=sessions_user, sessions_open=sessions_user_open, group=False, period=period)
-
 @app.route(settings.PREFIX + '/debug/')
 @view('debug')
 def debugfunc():
@@ -209,7 +200,6 @@ def acceptdata():
     hostname = request.environ.get("REMOTE_HOST")
     if hostname is None:
         hostname = socket.gethostbyaddr(ip_addr)[0]
-#    temp = (ip_addr, )
     reportedhostname = request.json['hostname']
     machineid = request.json['machineid']
     uptime = request.json['uptime']
@@ -219,15 +209,10 @@ def acceptdata():
     rrd_cpu.insert(hostname, [cpu['load'], cpu['loadavg'], cpu['cores']])
     rrd_users.insert(hostname, [len(set(users)),])
     session = Session()
-    computer.add_or_update(session, machineid, ip_addr, reportedhostname)
+    computer.add(session, machineid, ip_addr, reportedhostname)
+    session_pc.update_session(session, machineid, uptime)
+    computer.update(session, machineid, ip_addr, reportedhostname)
     return dict()
-#    res = db_exec_sql("select id from machines where ip = ?", temp)
-#    if len(res) == 0:
-#        temp = (ip_addr, hostname, )
-#        db_exec_sql("insert into machines ( ip, hostname, lastupdate ) values ( ?, ?, (DATETIME('now')))", temp)
-#    else:
-#        temp = (hostname, ip_addr, )
-#        db_exec_sql("update machines set hostname = ?, lastupdate = (DATETIME('now')) where ip = ?", temp)
 #    # here goes the report
 #    db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip_addr, reportedhostname))
 #    db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip_addr, uptime))

@@ -3,17 +3,13 @@
 import datetime
 from my_db import Computer, Room
 
-def add_or_update(db_session, machineid, ip_addr, reportedhostname):
-    """ Register computer in database by machineid, ip and hostname """
+def add(db_session, machineid, ip_addr, reportedhostname):
     computer = (db_session.query(Computer)
                .filter(Computer.machineid == machineid)
                .filter(Computer.ip == ip_addr)
                .filter(Computer.hostname == reportedhostname)
                .first())
-    if computer:
-        computer.last_report = datetime.datetime.now()
-        db_session.commit()
-    else:
+    if not computer:
         room = db_session.query(Room).filter(Room.name == "Прочее").first()
         if not room:
             room = Room(name = "Прочее")
@@ -23,4 +19,15 @@ def add_or_update(db_session, machineid, ip_addr, reportedhostname):
                             machineid = machineid,
                             room = room.id)
         db_session.add(computer)
+        db_session.commit()
+
+def update(db_session, machineid, ip_addr, reportedhostname):
+    """ Register computer in database by machineid, ip and hostname """
+    computer = (db_session.query(Computer)
+               .filter(Computer.machineid == machineid)
+               .filter(Computer.ip == ip_addr)
+               .filter(Computer.hostname == reportedhostname)
+               .first())
+    if computer:
+        computer.last_report = datetime.datetime.now()
         db_session.commit()
