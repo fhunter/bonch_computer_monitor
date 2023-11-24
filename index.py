@@ -33,15 +33,8 @@ def main():
     onlinecount = (session.query(ComputerSession)
                   .filter(ComputerSession.session_end.is_(None))
                   .count())
-    usersloggedin = session.query(UserSession).filter(UserSession.session_end.is_(None)).all()
     rooms = session.query(Room).order_by(Room.name).all()
     userslog = dict()
-#    for i in usersloggedin:
-#        if i[0] in userslog:
-#            temp = userslog[i[0]]
-#            userslog[i[0]] = temp + " " + i[1]
-#        else:
-#            userslog[i[0]] = i[1]
     displaydata = {}
     timenow = datetime.datetime.now()
     for i in rooms:
@@ -54,8 +47,9 @@ def main():
                  .filter(Computer.room == i.id)
                  .order_by(Computer.hostname)
                  .all())
-        # 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room
+        # 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room - FIXME - this should be dictionary
         for record in result:
+            userslog[record.machineid] = session_user.get_active_users(session, record.machineid)
             hostname = record.hostname
             if not hostname.endswith('.dcti.sut.ru'):
                 hostname = hostname + '.dcti.sut.ru'
@@ -73,7 +67,7 @@ def main():
         displaydata[i]['values'] = temp
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata,
-                date=datetime.datetime.now(),
+                date=timenow,
                 online=onlinecount,
                 userslog=userslog)
 

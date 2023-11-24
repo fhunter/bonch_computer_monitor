@@ -1,5 +1,13 @@
 from my_db import ComputerSession, Computer, UserSession
 
+def get_active_users(db_session, machineid):
+    computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
+    usersloggedin = (db_session.query(UserSession)
+                    .filter(UserSession.session_end.is_(None))
+                    .filter(UserSession.computer == computer.id)
+                    .all())
+    return list({i.username for i in usersloggedin})
+
 def get_sessions(db_session, machineid, start, end):
 #    # FIXME - reports all sessions
 #    computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
