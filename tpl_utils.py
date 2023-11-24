@@ -1,3 +1,4 @@
+""" Utility modules for templates and graphs """
 import datetime
 
 def time_to_color(time_value):
@@ -39,3 +40,12 @@ def ansible_data(ansible):
                  ansible[4],
                  str(datetime.datetime.fromtimestamp(ansible[0])))
     return "N/A"
+
+def get_graph_title(hostnames):
+    if isinstance(hostnames, str):
+        title = hostnames
+        hostnames = (hostnames,)
+    else:
+        title = hostnames[0]
+        hostnames = hostnames[1:]
+    return title, hostnames

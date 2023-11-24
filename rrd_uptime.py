@@ -3,17 +3,28 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
+from tpl_utils import get_graph_title
 
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start",
-        period_conv(period), "-w 800", "--title=Uptime %s" % hostname,
-        "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
-        "LINE1:uptime#0000FF:Uptime",
-        "CDEF:unavailable=uptime,UN,INF,0,IF",
-        "AREA:unavailable#f0f0f0",
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:uptime_%d=rrds/%s_uptime.rrd:uptime:LAST" % (j,i),
+            "LINE1:uptime_%d#0000FF:Uptime %s" % (j, i),
         )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=uptime_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
+
     return test['image']
 
 def insert(hostname, data, timestamp="N"):

@@ -1,3 +1,4 @@
+""" Module for working with writing and reading data for computer power on/off states """
 import datetime
 from sqlalchemy.sql import func
 from sqlalchemy import or_

@@ -3,36 +3,29 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
+from tpl_utils import get_graph_title
 
-#rrdtool create termserver2_scratch.rrd \
-#    --start $(date +%s --date="-2years") \
-#    --step 900 \
-#    DS:free:GAUGE:1200:0:10995116277760 \
-#    DS:total:GAUGE:1200:0:10995116277760 \
-#    RRA:AVERAGE:0.5:1:1200 \
-#    RRA:AVERAGE:0.5:6:1200 \
-#    RRA:AVERAGE:0.5:24:1200 \
-#    RRA:MIN:0.5:1:1200 \
-#    RRA:MIN:0.5:6:1200 \
-#    RRA:MIN:0.5:24:1200 \
-#    RRA:MAX:0.5:1:1200 \
-#    RRA:MAX:0.5:6:1200 \
-#    RRA:MAX:0.5:24:1200 \
-#    RRA:LAST:0.5:1:1200 \
-#    RRA:LAST:0.5:6:1200 \
-#    RRA:LAST:0.5:24:1200
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start",
-                        period_conv(period), "-w 800", "--title=/scratch %s" % hostname,
-                        "DEF:free=rrds/%s_scratch.rrd:free:LAST" % (hostname) ,
-                        "DEF:total=rrds/%s_scratch.rrd:total:LAST" % (hostname) ,
-                        "LINE2:total#009F00:Total",
-                        "LINE2:free#FF00FF:Free",
-                        "CDEF:unavailable=total,UN,INF,0,IF",
-                        "AREA:unavailable#f0f0f0",
-    )
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=/scratch %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:free_%d=rrds/%s_scratch.rrd:free:LAST" % (j, i) ,
+            "DEF:total_%d=rrds/%s_scratch.rrd:total:LAST" % (j,i) ,
+            "LINE2:total_%d#009F00:Total %s" % (j, i),
+            "LINE2:free_%d#FF00FF:Free %s" % (j, i),
+        )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=total_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
     return test['image']
 
 def insert(hostname, data, timestamp = "N"):

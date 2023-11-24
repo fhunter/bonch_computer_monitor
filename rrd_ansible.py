@@ -4,24 +4,34 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
+from tpl_utils import get_graph_title
 
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
     """ Produce graph for ansible data, over specified period. Period can be d/w/m/y """
-    test = rrdtool.graphv("-", "--start",
-                          period_conv(period), "-w 800", "--title=Ansible %s" % hostname,
-                          "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname),
-                          "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname),
-                          "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname),
-                          "DEF:failed=rrds/%s_ansible.rrd:failed:LAST" % (hostname),
-                          "LINE2:ok#00FF00:ok",
-                          "LINE2:change#FFFF00:change",
-                          "LINE3:unreachable#0000FF:unreachable",
-                          "LINE4:failed#FF0000:failed",
-                          "CDEF:unavailable=ok,UN,INF,0,IF",
-                          "AREA:unavailable#f0f0f0",
-                         )
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Ansible %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:ok_%d=rrds/%s_ansible.rrd:ok:LAST" % (j,i),
+            "DEF:change_%d=rrds/%s_ansible.rrd:change:LAST" % (j,i),
+            "DEF:unreachable_%d=rrds/%s_ansible.rrd:unreachable:LAST" % (j,i),
+            "DEF:failed_%d=rrds/%s_ansible.rrd:failed:LAST" % (j,i),
+            "LINE2:ok_%d#00FF00:ok %s" % (j,i),
+            "LINE2:change_%d#FFFF00:change %s" % (j,i),
+            "LINE3:unreachable_%d#0000FF:unreachable %s" % (j,i),
+            "LINE4:failed_%d#FF0000:failed %s" %(j,i),
+        )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=ok_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
     return test['image']
 
 def insert(hostname, data, timestamp="N"):

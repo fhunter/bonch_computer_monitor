@@ -1,10 +1,9 @@
-%include header_graphs
+%include header
 %import settings
 <h1>Графики для группы {{attr}}</h1>
 
 <h2>Нагрузка на процессор</h2>
 <img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu1/{{period}}"><br/>
-<img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu2/{{period}}"><br/>
 <img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu3/{{period}}">
 <h2>Количество пользователей</h2>
 <img src="{{settings.PREFIX}}/graph/g/{{attr}}_users/{{period}}"><br/>

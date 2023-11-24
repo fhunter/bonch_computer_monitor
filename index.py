@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 # coding=utf-8
+""" Computer user and ansible monitoring web-app """
 import datetime
 import glob
-import json
 import socket
 import os.path
 import bottle
@@ -157,21 +157,33 @@ def machinestats(grp, period = 'w'):
                 recipes[recipe_name]["title"] = j + " on " + hostname
             temp.append(temp2)
             tabs.append(temp)
-    tabs2 = json.dumps(tabs)
-    recipes2 = json.dumps(recipes)
     return dict(date=datetime.datetime.now(),
                 hosts=result,
                 popularity=popularity,
-                tabs=tabs2,
-                recipes=recipes2,
                 attr=room.name,
                 period=period,
                 group=True)
 
-@app.route(settings.PREFIX +'/graph/i/<hostname>_<typ>')
-@app.route(settings.PREFIX +'/graph/i/<hostname>_<typ>/<period:re:[d,w,m,y]>')
-def graphs_func(hostname, typ, period = 'w'):
+@app.route(settings.PREFIX +'/graph/<grp:re:[i,g]>/<hostname>_<typ>')
+@app.route(settings.PREFIX +'/graph/<grp:re:[i,g]>/<hostname>_<typ>/<period:re:[d,w,m,y]>')
+def graphs_func(hostname, typ, grp, period = 'w'):
     result = "Error"
+    if grp == "g":
+        session = Session()
+        room  = session.query(Room).filter(Room.name == hostname).first()
+        if not room:
+            return result
+        result = (session.query(Computer)
+                 .filter(Computer.room == room.id)
+                 .order_by(Computer.hostname)
+                 .all())
+        hostname = [room.name,]
+        for i in result:
+            host = i.hostname
+            if not host.endswith('.dcti.sut.ru'):
+                host = host + '.dcti.sut.ru'
+            hostname.append(host)
+        hostname = tuple(hostname)
     age = 1000 # 16 minutes
     if   typ == "uptime":
         result = rrd_uptime.graph(hostname, period)

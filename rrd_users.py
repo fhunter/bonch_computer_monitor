@@ -3,37 +3,58 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
+from tpl_utils import get_graph_title
+
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start",
-        period_conv(period), "-w 800", "--title=User count %s" % hostname,
-        "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
-        "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
-        "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
-        "CDEF:users_m=users,UN,0,users,IF",
-        "LINE2:users_m#0000FF:Users max",
-        "LINE2:usersa#00FFFF:Users average",
-        "CDEF:unavailable=uptime,UN,INF,0,IF",
-        "AREA:unavailable#f0f0f0",
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period),
+               "-w 800", "--title=User count %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:users_%d=rrds/%s_users.rrd:users:MAX" % (j,i),
+            "DEF:usersa_%d=rrds/%s_users.rrd:users:AVERAGE" % (j,i) ,
+            "DEF:uptime_%d=rrds/%s_uptime.rrd:uptime:LAST" % (j,i) ,
+            "CDEF:users_m_%d=users_%d,UN,0,users_%d,IF" % (j,j,j),
+            "LINE2:users_m_%d#0000FF:Users max %s" % (j,i),
+            "LINE2:usersa_%d#00FFFF:Users average %s" % (j,i),
         )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=uptime_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
     return test['image']
 
 @lru_cache(maxsize=128)
 def graph2(hostname, period):
-    test = rrdtool.graphv("-", "--start",
-        period_conv(period), "-w 800", "--title=CPU load per user %s" % hostname,
-        "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
-        "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
-        "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
-        "CDEF:users_m=users,UN,0,users,IF",
-        "CDEF:loadperuser1=load,users_m,/",
-        "CDEF:loadperuser=users_m,1,GE,loadperuser1,0,IF",
-#        "LINE2:usersa#00FFFF:Users average",
-        "LINE2:loadperuser#00FFFF:CPU load per user",
-        "CDEF:unavailable=users,UN,INF,0,IF",
-        "AREA:unavailable#f0f0f0",
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period),
+               "-w 800", "--title=CPU load per user %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:users_%d=rrds/%s_users.rrd:users:MAX" % (j, i) ,
+            "DEF:usersa_%d=rrds/%s_users.rrd:users:AVERAGE" % (j, i) ,
+            "DEF:load_%d=rrds/%s_cpu.rrd:load:MAX" % (j, i),
+            "CDEF:users_m_%d=users_%d,UN,0,users_%d,IF" % (j,j,j),
+            "CDEF:loadperuser1_%d=load_%d,users_m_%d,/" % (j,j,j),
+            "CDEF:loadperuser_%d=users_m_%d,1,GE,loadperuser1_%d,0,IF" % (j,j,j),
+            "LINE2:loadperuser_%d#00FFFF:CPU load per user %s" % (j,i),
         )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=users_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
     return test['image']
 
 def insert(hostname, data, timestamp="N"):

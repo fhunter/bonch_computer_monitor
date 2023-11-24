@@ -3,61 +3,72 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
+from tpl_utils import get_graph_title
 
-#rrdtool create termserver2_cpu.rrd \
-#    --start $(date +%s --date="-2years") \
-#    --step 900 \
-#    DS:load:GAUGE:1200:0:5000 \
-#    DS:loadavg:GAUGE:1200:0:5000 \
-#    DS:cores:GAUGE:1200:0:5000 \
-#    RRA:AVERAGE:0.5:1:1200 \
-#    RRA:AVERAGE:0.5:6:1200 \
-#    RRA:AVERAGE:0.5:24:1200 \
-#    RRA:MIN:0.5:1:1200 \
-#    RRA:MIN:0.5:6:1200 \
-#    RRA:MIN:0.5:24:1200 \
-#    RRA:MAX:0.5:1:1200 \
-#    RRA:MAX:0.5:6:1200 \
-#    RRA:MAX:0.5:24:1200 \
-#    RRA:LAST:0.5:1:1200 \
-#    RRA:LAST:0.5:6:1200 \
-#    RRA:LAST:0.5:24:1200
 
 @lru_cache(maxsize=128)
 def graph1(hostname, period):
     """ Produce graph for cpu load data, over specified period. Period can be d/w/m/y """
-    test = rrdtool.graphv("-", "--start",
-                          period_conv(period), "-w 800", "--title=Load %s" % hostname,
-                          "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
-                          "CDEF:load100=load,100,/",
-                          "LINE2:load#0000FF:load",
-                          "CDEF:unavailable=load,UN,INF,0,IF",
-                          "AREA:unavailable#f0f0f0",
-                         )
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:load_%d=rrds/%s_cpu.rrd:load:MAX" % (j,i),
+            "CDEF:load100_%d=load_%d,100,/" % (j,j),
+            "LINE2:load_%d#0000FF:load %s" % (j, i),
+        )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=load_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
     return test['image']
 
 @lru_cache(maxsize=128)
 def graph2(hostname, period):
     """ Produce graph for number of cores, over specified period. Period can be d/w/m/y """
-    test = rrdtool.graphv("-", "--start",
-                          period_conv(period), "-w 800", "--title=Load %s" % hostname,
-                          "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
-                          "LINE2:cores#00FFFF:cores",
-                          "CDEF:unavailable=cores,UN,INF,0,IF",
-                          "AREA:unavailable#f0f0f0",
-                         )
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:cores_%d=rrds/%s_cpu.rrd:cores:LAST" % (j,i),
+            "LINE2:cores_%d#00FFFF:cores %s" % (j,i),
+        )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=cores_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
     return test['image']
 
 @lru_cache(maxsize=128)
 def graph3(hostname, period):
     """ Produce graph for load average, over specified period. Period can be d/w/m/y """
-    test = rrdtool.graphv("-", "--start",
-                          period_conv(period), "-w 800", "--title=Load %s" % hostname,
-                          "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),
-                          "LINE2:loadavg#FF00FF:loadavg",
-                          "CDEF:unavailable=loadavg,UN,INF,0,IF",
-                          "AREA:unavailable#f0f0f0",
-                         )
+    title, hostname = get_graph_title(hostname)
+    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % title )
+    j = 1
+    for i in hostname:
+        new_arglist = (
+            "DEF:loadavg_%d=rrds/%s_cpu.rrd:loadavg:LAST" % (j,i),
+            "LINE2:loadavg_%d#FF00FF:loadavg %s" % (j,i),
+        )
+        arglist = arglist + new_arglist
+        j = j + 1
+    if len(hostname) == 1:
+        arglist = arglist + (
+            "CDEF:unavailable=loadavg_1,UN,INF,0,IF",
+            "AREA:unavailable#f0f0f0",
+        )
+    test = rrdtool.graphv(*arglist)
+
     return test['image']
 
 def insert(hostname, data, timestamp="N"):
