@@ -1,4 +1,4 @@
-%include header_graphs
+%include header
 %import settings
 <h1>Графики для {{machine}}</h1>
 %include menu
