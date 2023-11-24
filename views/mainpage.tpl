@@ -27,23 +27,23 @@
     </tr>
 %for i in value["values"]:
     <tr>
-        <td>{{i[0]}}</td>
-        <td><a href=./computer/{{i[10]}}>{{i[1]}}</a></td>
-        <td>{{i[2]}}</td>
-        <td>{{i[3]}}</td>
-        <td align=right>{{str(datetime.timedelta(seconds=int(i[4]*60.0)))}}</td>
+        <td>{{i["id"]}}</td>
+        <td><a href=./computer/{{i["machineid"]}}>{{i["ip"]}}</a></td>
+        <td>{{i["hostname"]}}</td>
+        <td>{{i["last_report"]}}</td>
+        <td align=right>{{str(datetime.timedelta(seconds=int(i["since_update"]*60.0)))}}</td>
         <td>
-            <font color="{{tpl_utils.time_to_color(i[4])}}">{{tpl_utils.time_to_online(i[4])}}</font>
+            <font color="{{tpl_utils.time_to_color(i["since_update"])}}">{{tpl_utils.time_to_online(i["since_update"])}}</font>
         </td>
-        <td>{{' '.join(userslog[i[10]])}}</td>
-        <td align=right>{{str(datetime.timedelta(minutes=i[5]))}}</td>
-        <td align=right>{{str(datetime.timedelta(minutes=i[6]))}}</td>
-        <td align=right>{{tpl_utils.usage_percent(i[6],i[5])}}</td>
-        <td>{{tpl_utils.scratch_data(i[8])}}</td>
-        <td>{{! tpl_utils.ansible_data(i[7])}}</td>
+        <td>{{' '.join(userslog[i["machineid"]])}}</td>
+        <td align=right>{{str(datetime.timedelta(minutes=i["power_time"]))}}</td>
+        <td align=right>{{str(datetime.timedelta(minutes=i["usage_time"]))}}</td>
+        <td align=right>{{tpl_utils.usage_percent(i["usage_time"],i["power_time"])}}</td>
+        <td>{{tpl_utils.scratch_data(i["scratch"])}}</td>
+        <td>{{! tpl_utils.ansible_data(i["ansible"])}}</td>
     </tr>
 %end
-%online = len([i[4] for i in value["values"] if i[4] < 10])
+%online = len([i["since_update"] for i in value["values"] if i["since_update"] < 10])
     <tr><td colspan=13><hr/></td></tr>
     <tr><td colspan=2></td><td>Всего:</td><td>{{value["total"]}}</td><td>Включено:</td><td>{{online}}</td></tr>
 </table>

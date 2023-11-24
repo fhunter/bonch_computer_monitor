@@ -55,20 +55,20 @@ def main():
             ansible = rrd_ansible.latest(hostname)
             scratch = rrd_scratch.latest(hostname)
             time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
-            # 1 - ip
-            # 2 - hostname
-            # 3 - lastupdate
-            # 4 - time since update
-            # 5 - room
-            # FIXME - this should be dictionary
-            temptuple = (record.id, record.ip, hostname, record.last_report, time_since_update)
-            temptuple = temptuple + (usage.getpowered(30, record.machineid),
-                                     usage.getusage(30, record.machineid),
-                                     ansible,
-                                     scratch,
-                                     'NaN',
-                                     record.machineid)
-            temp.append(temptuple)
+            computerdata = {
+                "id": record.id,
+                "ip": record.ip,
+                "hostname": hostname,
+                "last_report": record.last_report,
+                "since_update": time_since_update,
+                "power_time": usage.getpowered(30, record.machineid),
+                "usage_time": usage.getusage(30, record.machineid),
+                "ansible": ansible,
+                "scratch": scratch,
+                "battery": 'NaN',
+                "machineid": record.machineid
+            }
+            temp.append(computerdata)
         displaydata[i]['values'] = temp
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata,
@@ -82,7 +82,10 @@ def debugfunc():
     session = Session()
     usersloggedin = session.query(UserSession).all()
     rooms = session.query(Room).all()
-    computers = session.query(ComputerSession).all()
+    computers = (session.query(ComputerSession)
+                .order_by(ComputerSession.session_end)
+                .order_by(ComputerSession.session_start)
+                .all())
     computer_list = session.query(Computer).all()
     graphs = glob.glob('rrds/*_ansible.rrd')
     graphs = [i.replace('rrds/','').replace('_ansible.rrd','') for i in graphs]
