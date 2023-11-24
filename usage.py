@@ -72,11 +72,12 @@ def putansible(hostname,ok,change,unreachable,failed):
 
 def _normalise_time(time, start, end):
     """ Урезать time[0] до start и time[1] до end """
+    time_new = [time[0],time[1]]
     if time[0] < start:
-        time[0] = start
+        time_new[0] = start
     if time[1] > end:
-        time[1] = end
-    return time
+        time_new[1] = end
+    return tuple(time_new)
 
 def getpowered(period, machineid):
     """ Время во включенном состоянии компьютера за определённый период  period - в минутах"""
