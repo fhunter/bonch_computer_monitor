@@ -47,7 +47,6 @@ def main():
                  .filter(Computer.room == i.id)
                  .order_by(Computer.hostname)
                  .all())
-        # 1 - ip, 2 - hostname, 3 - lastupdate, 4 - time since update, 5 - room - FIXME - this should be dictionary
         for record in result:
             userslog[record.machineid] = session_user.get_active_users(session, record.machineid)
             hostname = record.hostname
@@ -56,6 +55,12 @@ def main():
             ansible = rrd_ansible.latest(hostname)
             scratch = rrd_scratch.latest(hostname)
             time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
+            # 1 - ip
+            # 2 - hostname
+            # 3 - lastupdate
+            # 4 - time since update
+            # 5 - room
+            # FIXME - this should be dictionary
             temptuple = (record.id, record.ip, hostname, record.last_report, time_since_update)
             temptuple = temptuple + (usage.getpowered(30, record.machineid),
                                      usage.getusage(30, record.machineid),
@@ -231,7 +236,7 @@ def acceptdata():
     session_pc.update_session(session, machineid, uptime)
     session_user.update_session(session, machineid, users)
     computer.update(session, machineid, ip_addr, reportedhostname)
-    # FIXME update uptime here
+    # FIXME update uptime and ansible tables here (do we need them?)
     return dict()
 
 if __name__ == '__main__':

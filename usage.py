@@ -2,7 +2,7 @@
 # coding=utf-8
 import settings
 import datetime
-from my_db import db_exec_sql
+from my_db import db_exec_sql, Session
 import session_user
 import session_pc
 
@@ -34,7 +34,7 @@ import session_pc
 #        uptime[time]=j
 #    return users,uptime
 
-def getpopularity(period, ip):
+def getpopularity(period, machineid):
     """ Популярность компьютера и проведённое на нём время
         period - в днях
         возвращает массив из пар время в минутах, пользователь
@@ -70,11 +70,26 @@ def putansible(hostname,ok,change,unreachable,failed):
         t = (ok, change, unreachable, failed, hostname)
         result = db_exec_sql("update ansible set ok = ?, change= ?, unreachable = ?, failed = ?, time = (DATETIME('now')) where hostname = ?", t)
 
+def _normalise_time(time, start, end):
+    """ Урезать time[0] до start и time[1] до end """
+    if time[0] < start:
+        time[0] = start
+    if time[1] > end:
+        time[1] = end
+    return time
 
 def getpowered(period, machineid):
-    """ Время во включенном состоянии компьютера за определённый период  period - в днях"""
-    #FIXME
-#    result = db_exec_sql("select count() from uptime where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))
-#    return result[0][0]*5
-    return 0
-
+    """ Время во включенном состоянии компьютера за определённый период  period - в минутах"""
+    session = Session()
+    now = datetime.datetime.now()
+    startoftoday = datetime.datetime(*now.timetuple()[:3])
+    starttime = startoftoday - datetime.timedelta(days = period)
+    endoftoday = datetime.datetime(*now.timetuple()[:3], 23, 59, 59)
+    computers = session_pc.get_sessions(session,
+                                        machineid,
+                                        startoftoday - datetime.timedelta(days = period),
+                                        endoftoday)
+    times = [(i.ComputerSession.session_start, i.session_end_c) for i in computers]
+    times = [_normalise_time(i, starttime, endoftoday) for i in times]
+    times = [(i[1] - i[0]).total_seconds()/60 for i in times]
+    return sum(times)

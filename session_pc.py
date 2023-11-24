@@ -1,11 +1,19 @@
 import datetime
+from sqlalchemy.sql import func
+from sqlalchemy import or_
 from my_db import ComputerSession, Computer
 
 
 def get_sessions(db_session, machineid, start, end):
-    # FIXME - reports all sessions
+    now = datetime.datetime.now()
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
-    sessions = db_session.query(ComputerSession).filter(Computer.machineid == computer.id).all()
+    sessions = (db_session.query(ComputerSession,
+                                 func.coalesce(ComputerSession.session_end, now)
+                                 .label("session_end_c"))
+               .filter(ComputerSession.computer == computer.id)
+               .filter(or_(ComputerSession.session_start.between(start,end),
+                           func.coalesce(ComputerSession.session_end, now).between(start,end)))
+               .all())
     return sessions
 
 def clean_sessions(db_session): # check if any sessions are stale
