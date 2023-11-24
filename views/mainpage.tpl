@@ -40,7 +40,7 @@
         <td align=right>{{str(datetime.timedelta(minutes=i[6]))}}</td>
         <td align=right>{{tpl_utils.usage_percent(i[6],i[5])}}</td>
         <td>{{tpl_utils.scratch_data(i[8])}}</td>
-        <td>{{tpl_utils.ansible_data(i[7])}}</td>
+        <td>{{! tpl_utils.ansible_data(i[7])}}</td>
     </tr>
 %end
 %online = len([i[4] for i in value["values"] if i[4] < 10])
