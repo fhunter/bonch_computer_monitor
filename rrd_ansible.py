@@ -1,12 +1,16 @@
+""" Module for manipulating ansible statistics in RRD database files """
+
 import os
+from functools import lru_cache
 import rrdtool
 from period import period_conv
-from functools import lru_cache
 
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Ansible %s" % hostname,
+    """ Produce graph for ansible data, over specified period. Period can be d/w/m/y """
+    test = rrdtool.graphv("-", "--start",
+                          period_conv(period), "-w 800", "--title=Ansible %s" % hostname,
                           "DEF:ok=rrds/%s_ansible.rrd:ok:LAST" % (hostname),
                           "DEF:change=rrds/%s_ansible.rrd:change:LAST" % (hostname),
                           "DEF:unreachable=rrds/%s_ansible.rrd:unreachable:LAST" % (hostname),
@@ -21,6 +25,7 @@ def graph(hostname, period):
     return test['image']
 
 def insert(hostname, data, timestamp="N"):
+    """ Insert data into RRD database file for ansible statistics """
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_ansible.rrd"
@@ -28,11 +33,13 @@ def insert(hostname, data, timestamp="N"):
     graph.cache_clear()
 
 def exists(hostname):
+    """ Vefiry if RRD database for specified hostname exists """
     rrdname = "rrds/" + hostname + "_ansible.rrd"
     return os.path.exists(rrdname)
 
 
 def create(hostname):
+    """ Create RRD database for specified hostname """
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_ansible.rrd"
         rrdtool.create(rrdname, '--start', '-2years',
@@ -55,22 +62,27 @@ def create(hostname):
                        'RRA:LAST:0.5:24:1200'
                       )
         return True
-    else:
-        return False
+    return False
 
 def last(hostname):
+    """ Get last timestamp for ansible statistics for the hostname """
     rrdname = "rrds/" + hostname + "_ansible.rrd"
     try:
-        last = rrdtool.last(rrdname)
+        last_time = rrdtool.last(rrdname)
     except:
         return None
-    return last
+    return last_time
 
 def latest(hostname):
+    """ Get last data for ansible statistics for the hostname """
     rrdname = "rrds/" + hostname + "_ansible.rrd"
     try:
         info = rrdtool.info(rrdname)
-        lastupdate = [info['last_update'], info['ds[ok].last_ds'], info['ds[change].last_ds'], info['ds[unreachable].last_ds'], info['ds[failed].last_ds']]
+        lastupdate = [info['last_update'],
+                      info['ds[ok].last_ds'],
+                      info['ds[change].last_ds'],
+                      info['ds[unreachable].last_ds'],
+                      info['ds[failed].last_ds']]
         return lastupdate
     except:
         return None

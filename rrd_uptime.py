@@ -1,12 +1,14 @@
+""" Module for manipulating uptime statistics in RRD database files """
 import os
+from functools import lru_cache
 import rrdtool
 from period import period_conv
-from functools import lru_cache
 
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % hostname,
+    test = rrdtool.graphv("-", "--start",
+        period_conv(period), "-w 800", "--title=Uptime %s" % hostname,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
         "LINE1:uptime#0000FF:Uptime",
         "CDEF:unavailable=uptime,UN,INF,0,IF",
@@ -46,17 +48,16 @@ def create(hostname):
                        'RRA:LAST:0.5:24:1200'
                       )
         return True
-    else:
-        return False
+    return False
 
 
 def last(hostname):
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     try:
-        last = rrdtool.last(rrdname)
+        last_time = rrdtool.last(rrdname)
     except:
         return None
-    return last
+    return last_time
 
 def latest(hostname):
     rrdname = "rrds/" + hostname + "_uptime.rrd"

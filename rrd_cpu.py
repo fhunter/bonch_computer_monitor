@@ -1,7 +1,8 @@
+""" Module for manipulating cpu load statistics in RRD database files """
 import os
+from functools import lru_cache
 import rrdtool
 from period import period_conv
-from functools import lru_cache
 
 #rrdtool create termserver2_cpu.rrd \
 #    --start $(date +%s --date="-2years") \
@@ -24,7 +25,9 @@ from functools import lru_cache
 
 @lru_cache(maxsize=128)
 def graph1(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
+    """ Produce graph for cpu load data, over specified period. Period can be d/w/m/y """
+    test = rrdtool.graphv("-", "--start",
+                          period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
                           "CDEF:load100=load,100,/",
                           "LINE2:load#0000FF:load",
@@ -35,7 +38,9 @@ def graph1(hostname, period):
 
 @lru_cache(maxsize=128)
 def graph2(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
+    """ Produce graph for number of cores, over specified period. Period can be d/w/m/y """
+    test = rrdtool.graphv("-", "--start",
+                          period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:cores=rrds/%s_cpu.rrd:cores:LAST" % (hostname),
                           "LINE2:cores#00FFFF:cores",
                           "CDEF:unavailable=cores,UN,INF,0,IF",
@@ -45,7 +50,9 @@ def graph2(hostname, period):
 
 @lru_cache(maxsize=128)
 def graph3(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % hostname,
+    """ Produce graph for load average, over specified period. Period can be d/w/m/y """
+    test = rrdtool.graphv("-", "--start",
+                          period_conv(period), "-w 800", "--title=Load %s" % hostname,
                           "DEF:loadavg=rrds/%s_cpu.rrd:loadavg:LAST" % (hostname),
                           "LINE2:loadavg#FF00FF:loadavg",
                           "CDEF:unavailable=loadavg,UN,INF,0,IF",
@@ -89,23 +96,24 @@ def create(hostname):
                        'RRA:LAST:0.5:24:1200'
                       )
         return True
-    else:
-        return False
+    return False
 
 def last(hostname):
     rrdname = "rrds/" + hostname + "_cpu.rrd"
     try:
-        last = rrdtool.last(rrdname)
+        last_time = rrdtool.last(rrdname)
     except:
         return None
-    return last
+    return last_time
 
 def latest(hostname):
     rrdname = "rrds/" + hostname + "_cpu.rrd"
     try:
         info = rrdtool.info(rrdname)
-        lastupdate = [info['last_update'], float(info['ds[load].last_ds']), float(info['ds[loadavg].last_ds'], float(info['ds[cores].last_ds']))]
+        lastupdate = [info['last_update'],
+                      float(info['ds[load].last_ds']),
+                      float(info['ds[loadavg].last_ds'],
+                      float(info['ds[cores].last_ds']))]
         return lastupdate
     except:
         return None
-

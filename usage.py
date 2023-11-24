@@ -3,6 +3,9 @@
 import settings
 import datetime
 from my_db import db_exec_sql
+import session_user
+import session_pc
+
 
 
 #def getdetailedusage(day,ip):
@@ -41,7 +44,7 @@ def getpopularity(period, ip):
 # FIXME
     return []
 
-def getusage(period,ip):
+def getusage(period, machineid):
     """ Использование компьютера за определённый период """
     #FIXME
 #    #result = db_exec_sql("select count() from users where (ip = ?) and (julianday('now') - julianday(time)) <= ? group by time",(ip, period))
@@ -68,7 +71,7 @@ def putansible(hostname,ok,change,unreachable,failed):
         result = db_exec_sql("update ansible set ok = ?, change= ?, unreachable = ?, failed = ?, time = (DATETIME('now')) where hostname = ?", t)
 
 
-def getpowered(period,ip):
+def getpowered(period, machineid):
     """ Время во включенном состоянии компьютера за определённый период  period - в днях"""
     #FIXME
 #    result = db_exec_sql("select count() from uptime where (ip = ?) and (julianday('now') - julianday(time)) <= ?",(ip, period))

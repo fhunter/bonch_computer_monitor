@@ -1,11 +1,13 @@
+""" Module for manipulating user count statistics in RRD database files """
 import os
+from functools import lru_cache
 import rrdtool
 from period import period_conv
-from functools import lru_cache
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=User count %s" % hostname,
+    test = rrdtool.graphv("-", "--start",
+        period_conv(period), "-w 800", "--title=User count %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
         "DEF:uptime=rrds/%s_uptime.rrd:uptime:LAST" % (hostname) ,
@@ -19,7 +21,8 @@ def graph(hostname, period):
 
 @lru_cache(maxsize=128)
 def graph2(hostname, period):
-    test = rrdtool.graphv("-", "--start", period_conv(period), "-w 800", "--title=CPU load per user %s" % hostname,
+    test = rrdtool.graphv("-", "--start",
+        period_conv(period), "-w 800", "--title=CPU load per user %s" % hostname,
         "DEF:users=rrds/%s_users.rrd:users:MAX" % (hostname) ,
         "DEF:usersa=rrds/%s_users.rrd:users:AVERAGE" % (hostname) ,
         "DEF:load=rrds/%s_cpu.rrd:load:MAX" % (hostname),
@@ -66,16 +69,15 @@ def create(hostname):
                        'RRA:LAST:0.5:24:1200'
                       )
         return True
-    else:
-        return False
+    return False
 
 def last(hostname):
     rrdname = "rrds/" + hostname + "_users.rrd"
     try:
-        last = rrdtool.last(rrdname)
+        last_time = rrdtool.last(rrdname)
     except:
         return None
-    return last
+    return last_time
 
 def latest(hostname):
     rrdname = "rrds/" + hostname + "_users.rrd"

@@ -17,6 +17,7 @@ import rrd_ansible
 import rrd_scratch
 
 import session_pc
+import session_user
 import computer
 import settings
 
@@ -28,6 +29,7 @@ app = application = bottle.Bottle()
 def main():
     session = Session()
     session_pc.clean_sessions(session)
+    session_user.clean_sessions(session)
     onlinecount = (session.query(ComputerSession)
                   .filter(ComputerSession.session_end.is_(None))
                   .count())
@@ -40,7 +42,6 @@ def main():
 #            userslog[i[0]] = temp + " " + i[1]
 #        else:
 #            userslog[i[0]] = i[1]
-#    onlinecount = online[0][0]
     displaydata = {}
     timenow = datetime.datetime.now()
     for i in rooms:
@@ -62,8 +63,8 @@ def main():
             scratch = rrd_scratch.latest(hostname)
             time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
             temptuple = (record.id, record.ip, hostname, record.last_report, time_since_update)
-            temptuple = temptuple + (usage.getpowered(30, record.ip),
-                                     usage.getusage(30, record.ip),
+            temptuple = temptuple + (usage.getpowered(30, record.machineid),
+                                     usage.getusage(30, record.machineid),
                                      ansible,
                                      scratch,
                                      'NaN',
@@ -234,14 +235,10 @@ def acceptdata():
     session = Session()
     computer.add(session, machineid, ip_addr, reportedhostname)
     session_pc.update_session(session, machineid, uptime)
+    session_user.update_session(session, machineid, users)
     computer.update(session, machineid, ip_addr, reportedhostname)
+    # FIXME update uptime here
     return dict()
-#    # here goes the report
-#    db_exec_sql("insert into hostnames (ip, hostname, time) values ( ?, ?, DATETIME('now'))", (ip_addr, reportedhostname))
-#    db_exec_sql("insert into uptime (ip, time, uptime) values ( ?, DATETIME('now'), ?)", (ip_addr, uptime))
-#    for i in users:
-#        db_exec_sql("insert into users (ip, time, users) values ( ?, DATETIME('now'), ?)", (ip_addr, i))
-#    return dict()
 
 if __name__ == '__main__':
     bottle.run(app,
