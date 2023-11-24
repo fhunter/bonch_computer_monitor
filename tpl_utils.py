@@ -29,9 +29,9 @@ def scratch_data(scrtch):
 def ansible_data(ansible):
     if ansible:
         return """
-        <font color="green">%d</font> /
-        <font color="orange">%d</font> /
-        <font color="black">%d</font> /
-        <font color="red">%d</font>&nbsp
+        <font color="green">%s</font> /
+        <font color="orange">%s</font> /
+        <font color="black">%s</font> /
+        <font color="red">%s</font>&nbsp
         %s""" % (ansible[1], ansible[2], ansible[3], ansible[4], str(datetime.datetime.fromtimestamp(ansible[0])))
     return "N/A"
