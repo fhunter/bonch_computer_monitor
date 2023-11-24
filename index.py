@@ -120,9 +120,10 @@ def machinestats2(machineid,period = 'w'):
                 period=period)
 
 
+@app.route(settings.PREFIX +'/group/<grp>/<period:re:[d,w,m,y]>')
 @app.route(settings.PREFIX +'/group/<grp>')
 @view('group')
-def machinestats(grp):
+def machinestats(grp, period = 'w'):
     session = Session()
     room  = session.query(Room).filter(Room.name == grp).first()
     if not room:
@@ -164,6 +165,7 @@ def machinestats(grp):
                 tabs=tabs2,
                 recipes=recipes2,
                 attr=room.name,
+                period=period,
                 group=True)
 
 @app.route(settings.PREFIX +'/graph/i/<hostname>_<typ>')
