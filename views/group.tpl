@@ -3,18 +3,18 @@
 <h1>Графики для группы {{attr}}</h1>
 
 <h2>Нагрузка на процессор</h2>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_cpu1/{{period}}><br/>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_cpu2/{{period}}><br/>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_cpu3/{{period}}>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu1/{{period}}"><br/>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu2/{{period}}"><br/>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu3/{{period}}">
 <h2>Количество пользователей</h2>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_users/{{period}}><br/>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_lpu/{{period}}>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_users/{{period}}"><br/>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_lpu/{{period}}">
 <h2>Свободное место на scratch</h2>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_scratch/{{period}}>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_scratch/{{period}}">
 <h2>Статус ansible</h2>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_ansible/{{period}}>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_ansible/{{period}}">
 <h2>Время работы</h2>
-<img src={{settings.PREFIX}}/graph/g/{{attr}}_uptime/{{period}}><br/>
+<img src="{{settings.PREFIX}}/graph/g/{{attr}}_uptime/{{period}}"><br/>
 
 <table border=1>
 <thead>
