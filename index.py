@@ -59,7 +59,8 @@ def main():
                 "id": record.id,
                 "ip": record.ip,
                 "hostname": hostname,
-                "last_report": record.last_report,
+                # Limit to seconds
+                "last_report": datetime.datetime(*record.last_report.timetuple()[:6]),
                 "since_update": time_since_update,
                 "power_time": usage.getpowered(30, record.machineid),
                 "usage_time": usage.getusage(30, record.machineid),

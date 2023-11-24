@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # coding=utf-8
-import settings
 import datetime
 from my_db import db_exec_sql, Session
 import session_user
@@ -92,5 +91,5 @@ def getpowered(period, machineid):
                                         endoftoday)
     times = [(i.ComputerSession.session_start, i.session_end_c) for i in computers]
     times = [_normalise_time(i, starttime, endoftoday) for i in times]
-    times = [(i[1] - i[0]).total_seconds()/60 for i in times]
+    times = [int((i[1] - i[0]).total_seconds()/60) for i in times]
     return sum(times)
