@@ -166,8 +166,8 @@ def machinestats(grp):
                 attr=room.name,
                 group=True)
 
-@app.route(settings.PREFIX +'/graph/<hostname>_<typ>')
-@app.route(settings.PREFIX +'/graph/<hostname>_<typ>/<period:re:[d,w,m,y]>')
+@app.route(settings.PREFIX +'/graph/i/<hostname>_<typ>')
+@app.route(settings.PREFIX +'/graph/i/<hostname>_<typ>/<period:re:[d,w,m,y]>')
 def graphs_func(hostname, typ, period = 'w'):
     result = "Error"
     age = 1000 # 16 minutes
