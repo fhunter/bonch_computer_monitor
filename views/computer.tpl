@@ -1,7 +1,7 @@
 %include header
 %import settings
 <h1>Графики для {{machine}}</h1>
-%include menu
+%include graph_menu path="computer/" + machine
 
 <h2>Нагрузка на процессор</h2>
 <img src={{settings.PREFIX}}/graph/i/{{machine}}_cpu1/{{period}}><br/>

@@ -101,7 +101,6 @@ def debugfunc():
 @view('computer')
 def machinestats2(machineid,period = 'w'):
     session = Session()
-#    result = db_exec_sql("select hostname, ip from machines where hostname like ?", (machine,))
     result = session.query(Computer).filter(Computer.machineid == machineid).first()
     if not result:
         redirect(settings.PREFIX + "/")

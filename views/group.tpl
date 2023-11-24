@@ -1,6 +1,7 @@
 %include header
 %import settings
 <h1>Графики для группы {{attr}}</h1>
+%include graph_menu path="group/" + attr
 
 <h2>Нагрузка на процессор</h2>
 <img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu1/{{period}}"><br/>
