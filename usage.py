@@ -13,13 +13,38 @@ def getpopularity(period, machineid):
         period - в днях
         возвращает массив из пар время в минутах, пользователь
     """
-    # FIXME
-    return []
+    session = Session()
+    now = datetime.datetime.now()
+    startoftoday = datetime.datetime(*now.timetuple()[:3])
+    starttime = startoftoday - datetime.timedelta(days = period)
+    endoftoday = datetime.datetime(*now.timetuple()[:3], 23, 59, 59)
+    users = session_user.get_sessions(session,
+                                      machineid,
+                                      startoftoday - datetime.timedelta(days = period),
+                                      endoftoday)
+    times = [(i.UserSession.session_start, i.session_end_c, i.UserSession.username) for i in users]
+    times = [_normalise_time(i, starttime, now) + (i[2],) for i in times]
+    times = [(i[2], int((i[1] - i[0]).total_seconds()/60)) for i in times]
+    summs = {i[0]:0 for i in times}
+    for i in times:
+        summs[i[0]]=summs[i[0]]+i[1]
+    return [(summs[i],i) for i in summs.keys()]
 
 def getusage(period, machineid):
     """ Использование компьютера за определённый период (в минутах) """
-    #FIXME
-    return 0
+    session = Session()
+    now = datetime.datetime.now()
+    startoftoday = datetime.datetime(*now.timetuple()[:3])
+    starttime = startoftoday - datetime.timedelta(days = period)
+    endoftoday = datetime.datetime(*now.timetuple()[:3], 23, 59, 59)
+    users = session_user.get_sessions(session,
+                                      machineid,
+                                      startoftoday - datetime.timedelta(days = period),
+                                      endoftoday)
+    times = [(i.UserSession.session_start, i.session_end_c) for i in users]
+    times = [_normalise_time(i, starttime, endoftoday) for i in times]
+    times = [int((i[1] - i[0]).total_seconds()/60) for i in times]
+    return sum(times)
 
 def _normalise_time(time, start, end):
     """ Урезать time[0] до start и time[1] до end """
