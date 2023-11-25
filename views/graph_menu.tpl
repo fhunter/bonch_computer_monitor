@@ -1,6 +1,13 @@
 %import settings
 <a href="{{settings.PREFIX}}/"><button>Домой</button></a>
-<a href="{{settings.PREFIX}}/{{path}}/d"><button>День</button></a>
-<a href="{{settings.PREFIX}}/{{path}}/w"><button>Неделя</button></a>
-<a href="{{settings.PREFIX}}/{{path}}/m"><button>Месяц</button></a>
-<a href="{{settings.PREFIX}}/{{path}}/y"><button>Год</button></a>
+%for i in (("d","День"),("w","Неделя"),("m","Месяц"),("y","Год")):
+<a href="{{settings.PREFIX}}/{{path}}/{{i[0]}}"><button>
+%if period==i[0]:
+<b>
+%end
+{{i[1]}}
+%if period==i[0]:
+</b>
+%end
+</font>
+</button></a>
