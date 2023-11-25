@@ -103,13 +103,9 @@ def machinestats2(machineid,period = 'w'):
     result = session.query(Computer).filter(Computer.machineid == machineid).first()
     if not result:
         redirect(settings.PREFIX + "/")
-    ip_addr = result.ip
-    hostname = result.hostname
-    if not hostname.endswith('.dcti.sut.ru'):
-        hostname = hostname + '.dcti.sut.ru'
-    popularity = {}
-    for j in [7, 14, 30, 60, 90, 180]:
-        popularity[j] = usage.getpopularity(j, ip_addr) #FIXME
+    hostname = expand_hostname(result.hostname)
+    days = period_to_days(period)
+    popularity = usage.getpopularity(days, machineid)
     return dict(date=datetime.datetime.now(),
                 machine=hostname,
                 popularity=popularity,

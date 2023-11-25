@@ -27,8 +27,7 @@
 %def myfunc(e):
 %return e[1]
 %end
-%for i in [7,14,30,60,90,180]:
-<tr><td>{{i}}</td>
+<tr><td>6</td>
 <td valign=top>
 	<table border=1 width=100%>
 	<thead>
@@ -36,8 +35,9 @@
 	<th>Пользователь</th><th>минуты</th>
 	<tr>
 	</thead>
-	%popularity[i].sort(key=myfunc,reverse=True)
-	%for k in popularity[i]:
+    <!--- FIXME -->
+	%popularity.sort(key=myfunc,reverse=True)
+	%for k in popularity:
 	<tr>
 	<td>{{k[0]}}</td><td>{{k[1]}}</td>
 	</tr>
