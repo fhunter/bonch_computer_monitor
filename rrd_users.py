@@ -74,22 +74,7 @@ def exists(hostname):
 def create(hostname):
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_users.rrd"
-        rrdtool.create(rrdname, '--start', '-2years',
-                       '--step', '900',
-                       'DS:users:GAUGE:1200:0:5000',
-                       'RRA:AVERAGE:0.5:1:1200',
-                       'RRA:AVERAGE:0.5:6:1200',
-                       'RRA:AVERAGE:0.5:24:1200',
-                       'RRA:MIN:0.5:1:1200',
-                       'RRA:MIN:0.5:6:1200',
-                       'RRA:MIN:0.5:24:1200',
-                       'RRA:MAX:0.5:1:1200',
-                       'RRA:MAX:0.5:6:1200',
-                       'RRA:MAX:0.5:24:1200',
-                       'RRA:LAST:0.5:1:1200',
-                       'RRA:LAST:0.5:6:1200',
-                       'RRA:LAST:0.5:24:1200'
-                      )
+        rrd.create(rrdname, [["users", 5000],])
         return True
     return False
 

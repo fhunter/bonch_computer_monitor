@@ -53,25 +53,7 @@ def create(hostname):
     """ Create RRD database for specified hostname """
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_ansible.rrd"
-        rrdtool.create(rrdname, '--start', '-2years',
-                       '--step', '900',
-                       'DS:ok:GAUGE:1200:0:500',
-                       'DS:change:GAUGE:1200:0:500',
-                       'DS:unreachable:GAUGE:1200:0:500',
-                       'DS:failed:GAUGE:1200:0:500',
-                       'RRA:AVERAGE:0.5:1:1200',
-                       'RRA:AVERAGE:0.5:6:1200',
-                       'RRA:AVERAGE:0.5:24:1200',
-                       'RRA:MIN:0.5:1:1200',
-                       'RRA:MIN:0.5:6:1200',
-                       'RRA:MIN:0.5:24:1200',
-                       'RRA:MAX:0.5:1:1200',
-                       'RRA:MAX:0.5:6:1200',
-                       'RRA:MAX:0.5:24:1200',
-                       'RRA:LAST:0.5:1:1200',
-                       'RRA:LAST:0.5:6:1200',
-                       'RRA:LAST:0.5:24:1200'
-                      )
+        rrd.create(rrdname, [["ok", 500],["change", 500], ["unreachable", 500], ["failed", 500]])
         return True
     return False
 

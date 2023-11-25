@@ -44,23 +44,7 @@ def exists(hostname):
 def create(hostname):
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_scratch.rrd"
-        rrdtool.create(rrdname, '--start', '-2years',
-            '--step', '900',
-            'DS:free:GAUGE:1200:0:10995116277760',
-            'DS:total:GAUGE:1200:0:10995116277760',
-            'RRA:AVERAGE:0.5:1:1200',
-            'RRA:AVERAGE:0.5:6:1200',
-            'RRA:AVERAGE:0.5:24:1200',
-            'RRA:MIN:0.5:1:1200',
-            'RRA:MIN:0.5:6:1200',
-            'RRA:MIN:0.5:24:1200',
-            'RRA:MAX:0.5:1:1200',
-            'RRA:MAX:0.5:6:1200',
-            'RRA:MAX:0.5:24:1200',
-            'RRA:LAST:0.5:1:1200',
-            'RRA:LAST:0.5:6:1200',
-            'RRA:LAST:0.5:24:1200'
-          )
+        rrd.create(rrdname, [["free", 10995116277760],["total", 10995116277760]])
         return True
     return False
 
