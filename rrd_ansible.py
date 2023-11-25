@@ -5,6 +5,7 @@ from functools import lru_cache
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
+import rrd
 
 
 @lru_cache(maxsize=128)
@@ -77,22 +78,11 @@ def create(hostname):
 def last(hostname):
     """ Get last timestamp for ansible statistics for the hostname """
     rrdname = "rrds/" + hostname + "_ansible.rrd"
-    try:
-        last_time = rrdtool.last(rrdname)
-    except:
-        return None
+    last_time = rrd.last(rrdname)
     return last_time
 
 def latest(hostname):
     """ Get last data for ansible statistics for the hostname """
     rrdname = "rrds/" + hostname + "_ansible.rrd"
-    try:
-        info = rrdtool.info(rrdname)
-        lastupdate = [info['last_update'],
-                      info['ds[ok].last_ds'],
-                      info['ds[change].last_ds'],
-                      info['ds[unreachable].last_ds'],
-                      info['ds[failed].last_ds']]
-        return lastupdate
-    except:
-        return None
+    lastupdate = rrd.latest(rrdname, ["ok","change","unreachable","failed"])
+    return lastupdate

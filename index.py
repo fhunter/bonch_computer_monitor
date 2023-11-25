@@ -20,6 +20,7 @@ import session_pc
 import session_user
 import computer
 import settings
+from tpl_utils import period_to_days, expand_hostname
 
 bottle.debug(True)
 app = application = bottle.Bottle()
@@ -49,9 +50,7 @@ def main():
                  .all())
         for record in result:
             userslog[record.machineid] = session_user.get_active_users(session, record.machineid)
-            hostname = record.hostname
-            if not hostname.endswith('.dcti.sut.ru'):
-                hostname = hostname + '.dcti.sut.ru'
+            hostname = expand_hostname(record.hostname)
             ansible = rrd_ansible.latest(hostname)
             scratch = rrd_scratch.latest(hostname)
             time_since_update = (timenow - record.last_report).total_seconds()/60 # in minutes
@@ -135,16 +134,12 @@ def machinestats(grp, period = 'w'):
     recipes = {}
     popularity = {}
     for i in result:
-        hostname = i.hostname
-        if not hostname.endswith('.dcti.sut.ru'):
-            hostname = hostname + '.dcti.sut.ru'
+        hostname = expand_hostname(i.hostname)
         popularity[i.hostname] = {}
         for j in [7, 14, 30, 60, 90, 180]:
             popularity[i.hostname][j] = usage.getpopularity(j, i.machineid)
     for i in result:
-        hostname = i.hostname
-        if not hostname.endswith('.dcti.sut.ru'):
-            hostname = hostname + '.dcti.sut.ru'
+        hostname = expand_hostname(i.hostname)
         if os.path.isdir("/var/www/rrds/"+hostname):
             temp = []
             temp.append(hostname)
@@ -178,9 +173,7 @@ def graphs_func(hostname, typ, grp, period = 'w'):
                  .all())
         hostname = [room.name,]
         for i in result:
-            host = i.hostname
-            if not host.endswith('.dcti.sut.ru'):
-                host = host + '.dcti.sut.ru'
+            host = expand_hostname(i.hostname)
             hostname.append(host)
         hostname = tuple(hostname)
     age = 1000 # 16 minutes
@@ -218,7 +211,7 @@ def acceptansibledata():
         unreachable_value = request.json['unreachable']
         failed_value = request.json['failed']
         rrd_ansible.insert(hostname, [ok_value, change_value, unreachable_value, failed_value])
-    except:
+    except BaseException:
         pass
     return dict()
 

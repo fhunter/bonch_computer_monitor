@@ -4,6 +4,7 @@ from functools import lru_cache
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
+import rrd
 
 
 @lru_cache(maxsize=128)
@@ -94,17 +95,10 @@ def create(hostname):
 
 def last(hostname):
     rrdname = "rrds/" + hostname + "_users.rrd"
-    try:
-        last_time = rrdtool.last(rrdname)
-    except:
-        return None
+    last_time = rrd.last(rrdname)
     return last_time
 
 def latest(hostname):
     rrdname = "rrds/" + hostname + "_users.rrd"
-    try:
-        info = rrdtool.info(rrdname)
-        lastupdate = [info['last_update'], info['ds[users].last_ds']]
-        return lastupdate
-    except:
-        return None
+    lastupdate = rrd.latest(rrdname, ["users"])
+    return lastupdate

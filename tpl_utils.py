@@ -41,6 +41,22 @@ def ansible_data(ansible):
                  str(datetime.datetime.fromtimestamp(ansible[0])))
     return "N/A"
 
+def expand_hostname(hostname):
+    if not hostname.endswith('.dcti.sut.ru'):
+        hostname = hostname + '.dcti.sut.ru'
+    return hostname
+
+def period_to_days(period):
+    if period == "d":
+        return 1
+    if period == "w":
+        return 7
+    if period == "m":
+        return 30
+    if period == "y":
+        return 365
+    return None
+
 def get_graph_title(hostnames):
     if isinstance(hostnames, str):
         title = hostnames
