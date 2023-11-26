@@ -42,6 +42,7 @@ def close_session(db_session, machineid, user):
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     sessions = (db_session.query(UserSession)
                .filter(UserSession.computer == computer.id)
+               .filter(UserSession.username == user)
                .filter(UserSession.session_end.is_(None))
                .all())
     for i in sessions:
