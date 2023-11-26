@@ -6,10 +6,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 
-engine = create_engine('sqlite:///database_.sqlite3', echo=True)
+engine = create_engine('sqlite:///database_.sqlite3', echo=False)
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
