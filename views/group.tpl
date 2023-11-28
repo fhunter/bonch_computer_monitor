@@ -1,5 +1,6 @@
 %include header
 %import settings
+%import tpl_utils
 <h1>Графики для группы {{attr}}</h1>
 %include graph_menu path="group/" + attr, period=period
 
@@ -16,26 +17,24 @@
 <h2>Время работы</h2>
 <img src="{{settings.PREFIX}}/graph/g/{{attr}}_uptime/{{period}}"><br/>
 
-<table border=1>
-<thead>
-<tr>
-<th rowspan=2>Компьютер</th><th colspan=4>Пользователи</th>
-</tr>
-<tr>
 %def myfunc(e):
 %return e[1]
 %end
-%for i in [7,14,30,60,90,180]:
-<th>{{i}} дней</th>
+<h2> Использование за {{tpl_utils.period_to_days(period)}} дней</h2>
+<table border=1>
+<thead>
+<tr>
+%for i in hosts:
+<th>
+{{i.hostname}}
+</th>
 %end
 </tr>
-</thead>
-%for i in hosts:
 <tr>
-<td>
-{{i.hostname}}
-</td>
-%for j in [7,14,30,60,90,180]:
+</tr>
+</thead>
+<tr>
+%for i in hosts:
 <td valign=top>
 	<table border=1>
 	<thead>
@@ -43,8 +42,8 @@
 	<th>Пользователь</th><th>минуты</th>
 	<tr>
 	</thead>
-	%popularity[i.hostname][j].sort(reverse=True,key=myfunc)
-	%for k in popularity[i.hostname][j]:
+	%popularity[i.hostname].sort(reverse=True,key=myfunc)
+	%for k in popularity[i.hostname]:
 	<tr>
 	<td>{{k[0]}}</td><td>{{k[1]}}</td>
 	</tr>
@@ -53,6 +52,5 @@
 </td>
 %end
 </tr>
-%end
 </table>
 %include footer

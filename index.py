@@ -126,27 +126,11 @@ def machinestats(grp, period = 'w'):
              .filter(Computer.room == room.id)
              .order_by(Computer.hostname)
              .all())
-    tabs = []
-    recipes = {}
     popularity = {}
+    days = period_to_days(period)
     for i in result:
         hostname = expand_hostname(i.hostname)
-        popularity[i.hostname] = {}
-        for j in [7, 14, 30, 60, 90, 180]:
-            popularity[i.hostname][j] = usage.getpopularity(j, i.machineid)
-    for i in result:
-        hostname = expand_hostname(i.hostname)
-        if os.path.isdir("/var/www/rrds/"+hostname):
-            temp = []
-            temp.append(hostname)
-            temp2 = []
-            for j in ["cpu", "memory", "load", "users", "uptime"]:
-                recipe_name = hostname+"_"+j
-                temp2.append(recipe_name)
-                recipes[recipe_name] = {}
-                recipes[recipe_name]["title"] = j + " on " + hostname
-            temp.append(temp2)
-            tabs.append(temp)
+        popularity[i.hostname] = usage.getpopularity(days, i.machineid)
     return dict(date=datetime.datetime.now(),
                 hosts=result,
                 popularity=popularity,
