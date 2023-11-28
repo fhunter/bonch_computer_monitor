@@ -1,5 +1,6 @@
 %include header
 %import settings
+%import tpl_utils
 <h1>Графики для {{machine}}</h1>
 %include graph_menu path="computer/" + attr, period=period
 
@@ -18,32 +19,22 @@
 <img src={{settings.PREFIX}}/graph/i/{{machine}}_uptime/{{period}}>
 
 
-<table border=1 width=75%>
-<thead>
-<tr>
-<th>Дней</th><th>Пользователи</th>
-</tr>
-</thead>
 %def myfunc(e):
 %return e[1]
 %end
-<tr><td>6</td>
-<td valign=top>
-	<table border=1 width=100%>
-	<thead>
-	<tr>
-	<th>Пользователь</th><th>минуты</th>
-	<tr>
-	</thead>
-    <!--- FIXME -->
-	%popularity.sort(key=myfunc,reverse=True)
-	%for k in popularity:
-	<tr>
-	<td>{{k[0]}}</td><td>{{k[1]}}</td>
-	</tr>
-	%end
-	</table>
-</td></tr>
+<h2> Использование за {{tpl_utils.period_to_days(period)}} дней</h2>
+<table border=1 width=50%>
+<thead>
+<tr>
+<th>Пользователь</th><th>минуты</th>
+<tr>
+</thead>
+<!--- FIXME -->
+%popularity.sort(key=myfunc,reverse=True)
+%for k in popularity:
+<tr>
+<td>{{k[0]}}</td><td>{{k[1]}}</td>
+</tr>
 %end
 </table>
 %include footer

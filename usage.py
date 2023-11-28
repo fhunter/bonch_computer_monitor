@@ -28,7 +28,7 @@ def getpopularity(period, machineid):
     summs = {i[0]:0 for i in times}
     for i in times:
         summs[i[0]]=summs[i[0]]+i[1]
-    return [(summs[i],i) for i in summs.keys()]
+    return [(i,summs[i]) for i in summs.keys()]
 
 def getusage(period, machineid):
     """ Использование компьютера за определённый период (в минутах) """
