@@ -49,9 +49,9 @@ def is_ansible_ok(ansible,last_report):
         delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
         delta = delta / datetime.timedelta(hours=1)
         if delta >= 12:
-            return "Нет свежего отчёта ansible"
+            return "Нет данных"
         if int(ansible[4]) > 0:
-            return "Ansible вернул ошибку"
+            return "Ошибка!"
         return ""
     else:
         return ""

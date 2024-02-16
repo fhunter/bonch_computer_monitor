@@ -42,7 +42,7 @@
         <td align=right>{{tpl_utils.usage_percent(i["usage_time"],i["power_time"])}}</td>
         <td>{{tpl_utils.scratch_data(i["scratch"])}}</td>
         <td>{{! tpl_utils.ansible_data(i["ansible"])}}</td>
-        <td>{{! tpl_utils.is_ansible_ok(i["ansible"],i["last_report"])}}</td>
+        <td><font color="red">{{tpl_utils.is_ansible_ok(i["ansible"],i["last_report"])}}</font></td>
     </tr>
 %end
 %online = len([i["since_update"] for i in value["values"] if i["since_update"] < 10])
