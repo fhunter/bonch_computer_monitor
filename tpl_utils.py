@@ -41,6 +41,16 @@ def ansible_data(ansible):
                  str(datetime.datetime.fromtimestamp(ansible[0])))
     return "N/A"
 
+def is_ansible_ok(ansible,last_report):
+    """ ansible - tuple of ansible values, [0] - timestamp
+    last_report - datetime
+    """
+    if ansible:
+        return last_report-datetime.datetime.fromtimestamp(ansible[0])
+    else:
+        return ""
+
+
 def expand_hostname(hostname):
     if not hostname.endswith('.dcti.sut.ru'):
         hostname = hostname + '.dcti.sut.ru'

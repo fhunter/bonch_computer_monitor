@@ -19,6 +19,7 @@
         <th colspan=3>Использование за месяц<br/> часов:минут:секунд</th>
         <th rowspan=2>Объём /scratch </th>
         <th rowspan=2>Отчёт<br/>Ansible</th>
+        <th rowspan=2>&nbsp</th>
     </tr>
     <tr>
         <th>Включён</th>
@@ -41,6 +42,7 @@
         <td align=right>{{tpl_utils.usage_percent(i["usage_time"],i["power_time"])}}</td>
         <td>{{tpl_utils.scratch_data(i["scratch"])}}</td>
         <td>{{! tpl_utils.ansible_data(i["ansible"])}}</td>
+        <td>{{! tpl_utils.is_ansible_ok(i["ansible"],i["last_report"])}}</td>
     </tr>
 %end
 %online = len([i["since_update"] for i in value["values"] if i["since_update"] < 10])
