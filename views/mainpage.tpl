@@ -35,7 +35,7 @@
         <td>
             <font color="{{tpl_utils.time_to_color(i["since_update"])}}">{{tpl_utils.time_to_online(i["since_update"])}}</font>
         </td>
-        <td>{{' '.join(userslog[i["machineid"]])}}</td>
+        <td>{{! '<br/>'.join(userslog[i["machineid"]])}}</td>
         <td align=right>{{str(datetime.timedelta(minutes=i["power_time"]))}}</td>
         <td align=right>{{str(datetime.timedelta(minutes=i["usage_time"]))}}</td>
         <td align=right>{{tpl_utils.usage_percent(i["usage_time"],i["power_time"])}}</td>
