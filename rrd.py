@@ -6,7 +6,7 @@ def create(filename,data_limits):
     """ data_limits - list of pairs of [name, max_value] """
     arglist = (filename, "--start", '-2years', '--step', '900')
     for i in data_limits:
-        arglist = arglist + (f"DS:{i[0]}:GAUGE:1200:0:{i[1]}")
+        arglist = arglist + (f"DS:{i[0]}:GAUGE:1200:0:{i[1]}",)
     arglist = arglist + ('RRA:AVERAGE:0.5:1:1200',
                          'RRA:AVERAGE:0.5:6:1200',
                          'RRA:AVERAGE:0.5:24:1200',
