@@ -73,6 +73,7 @@ def graph3(hostname, period):
     return test['image']
 
 def insert(hostname, data, timestamp="N"):
+    """ Insert data to cpu graph. data = (load, loadavg, cores) """
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_cpu.rrd"
@@ -82,11 +83,13 @@ def insert(hostname, data, timestamp="N"):
     graph3.cache_clear()
 
 def exists(hostname):
+    """ Check if rrdfile exists """
     rrdname = "rrds/" + hostname + "_cpu.rrd"
     return os.path.exists(rrdname)
 
 
 def create(hostname):
+    """ Create rrdfile if not exists """
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_cpu.rrd"
         rrd.create(rrdname, [["load", 5000],["loadavg", 5000], ["cores", 5000]])
@@ -94,11 +97,13 @@ def create(hostname):
     return False
 
 def last(hostname):
+    """ Get last time when specific rrd file was updated """
     rrdname = "rrds/" + hostname + "_cpu.rrd"
     last_time = rrd.last(rrdname)
     return last_time
 
 def latest(hostname):
+    """ Get latest set of data for specific rrd file """
     rrdname = "rrds/" + hostname + "_cpu.rrd"
     lastupdate = rrd.latest(rrdname, ["load","loadavg","cores"])
     if lastupdate:

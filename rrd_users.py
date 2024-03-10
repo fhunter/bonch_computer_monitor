@@ -9,6 +9,7 @@ import rrd
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
+    """ Plot user count graph """
     title, hostname = get_graph_title(hostname)
     arglist = ("-", "--start", period_conv(period),
                "-w 800", "--title=User count %s" % title )
@@ -34,6 +35,7 @@ def graph(hostname, period):
 
 @lru_cache(maxsize=128)
 def graph2(hostname, period):
+    """ Plot load per user graph """
     title, hostname = get_graph_title(hostname)
     arglist = ("-", "--start", period_conv(period),
                "-w 800", "--title=CPU load per user %s" % title )
@@ -59,6 +61,7 @@ def graph2(hostname, period):
     return test['image']
 
 def insert(hostname, data, timestamp="N"):
+    """ Insert data to users graph. data = number of users """
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_users.rrd"
@@ -67,11 +70,13 @@ def insert(hostname, data, timestamp="N"):
     graph2.cache_clear()
 
 def exists(hostname):
+    """ Check if rrdfile exists """
     rrdname = "rrds/" + hostname + "_users.rrd"
     return os.path.exists(rrdname)
 
 
 def create(hostname):
+    """ Create rrdfile if not exists """
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_users.rrd"
         rrd.create(rrdname, [["users", 5000],])
@@ -79,11 +84,13 @@ def create(hostname):
     return False
 
 def last(hostname):
+    """ Get last time when specific rrd file was updated """
     rrdname = "rrds/" + hostname + "_users.rrd"
     last_time = rrd.last(rrdname)
     return last_time
 
 def latest(hostname):
+    """ Get latest set of data for specific rrd file """
     rrdname = "rrds/" + hostname + "_users.rrd"
     lastupdate = rrd.latest(rrdname, ["users"])
     return lastupdate

@@ -4,9 +4,8 @@
 import datetime
 import glob
 import socket
-import os.path
 import bottle
-from bottle import view, request, response, redirect
+from bottle import view, request, response, redirect, static_file
 from my_db import Session, Room, UserSession, ComputerSession, Computer
 import usage
 
@@ -28,6 +27,7 @@ app = application = bottle.Bottle()
 @app.route(settings.PREFIX + '/')
 @view('mainpage')
 def main():
+    """ Generate main page data """
     session = Session()
     session_pc.clean_sessions(session)
     session_user.clean_sessions(session)
@@ -79,6 +79,7 @@ def main():
 @app.route(settings.PREFIX + '/debug/')
 @view('debug')
 def debugfunc():
+    """ Debug function for data """
     session = Session()
     usersloggedin = session.query(UserSession).all()
     rooms = session.query(Room).all()
@@ -99,6 +100,7 @@ def debugfunc():
 @app.route(settings.PREFIX +'/computer/<machineid>')
 @view('computer')
 def machinestats2(machineid,period = 'w'):
+    """ Output stats for specific computer """
     session = Session()
     result = session.query(Computer).filter(Computer.machineid == machineid).first()
     if not result:
@@ -118,6 +120,7 @@ def machinestats2(machineid,period = 'w'):
 @app.route(settings.PREFIX +'/group/<grp>')
 @view('group')
 def machinestats(grp, period = 'w'):
+    """ Output stats for specific group """
     session = Session()
     room  = session.query(Room).filter(Room.name == grp).first()
     if not room:
@@ -141,6 +144,7 @@ def machinestats(grp, period = 'w'):
 @app.route(settings.PREFIX +'/graph/<grp:re:[i,g]>/<hostname>_<typ>')
 @app.route(settings.PREFIX +'/graph/<grp:re:[i,g]>/<hostname>_<typ>/<period:re:[d,w,m,y]>')
 def graphs_func(hostname, typ, grp, period = 'w'):
+    """ Output graph for specific group """
     result = "Error"
     if grp == "g":
         session = Session()
@@ -181,6 +185,7 @@ def graphs_func(hostname, typ, grp, period = 'w'):
 
 @app.route(settings.PREFIX +'/api/ansible', method='POST')
 def acceptansibledata():
+    """ Accept ansible data """
     ip_addr = request.environ.get("REMOTE_ADDR")
     hostname = request.environ.get("REMOTE_HOST")
     if hostname is None:
@@ -197,6 +202,7 @@ def acceptansibledata():
 
 @app.route(settings.PREFIX +'/api/scratch', method='POST')
 def acceptscratchdata():
+    """ Accept scratch data """
     ip_addr = request.environ.get("REMOTE_ADDR")
     hostname = request.environ.get("REMOTE_HOST")
     if hostname is None:
@@ -209,6 +215,7 @@ def acceptscratchdata():
 
 @app.route(settings.PREFIX +'/api/data', method='POST')
 def acceptdata():
+    """ Accept all remaining data """
     ip_addr = request.environ.get("REMOTE_ADDR")
     hostname = request.environ.get("REMOTE_HOST")
     if hostname is None:
@@ -228,6 +235,16 @@ def acceptdata():
     computer.update(session, machineid, ip_addr, reportedhostname)
     # FIXME update uptime and ansible tables here (do we need them?)
     return dict()
+
+@app.route(settings.PREFIX + r'/<filename:re:.*\.css>')
+def send_css(filename):
+    """ Send css files """
+    return static_file(filename, root='./files/', mimetype='text/css')
+
+@app.route(settings.PREFIX + r'/<filename:re:.*\.js>')
+def send_js(filename):
+    """ Send js files """
+    return static_file(filename, root='./files/', mimetype='text/javascript')
 
 if __name__ == '__main__':
     bottle.run(app,

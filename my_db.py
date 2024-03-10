@@ -14,10 +14,8 @@ Session = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
-def db_exec_sql(*params):
-    raise Exception("Not implemented %s" % (params))
-
 class Computer(Base):
+    """ Computer representation table """
     __tablename__ = 'computer'
 
     id = Column(Integer, primary_key=True)
@@ -36,6 +34,7 @@ class Computer(Base):
             self.hostname, self.machineid, self.first_report, self.last_report, self.ip, self.room)
 
 class Uptime(Base):
+    """ Uptime table """
     __tablename__ = 'uptime'
     id = Column(Integer, primary_key=True)
     last_report = Column(DateTime, nullable = False, default=func.now())
@@ -49,6 +48,7 @@ class Uptime(Base):
 
 
 class Room(Base):
+    """ Room list table """
     __tablename__ = 'room'
 
     id = Column(Integer, primary_key=True)
@@ -58,6 +58,7 @@ class Room(Base):
         return "<Room(name='%s')>" % (self.name,)
 
 class ComputerSession(Base):
+    """ Computer run times table """
     __tablename__ = 'computer_session'
 
     id = Column(Integer, primary_key=True)
@@ -70,6 +71,7 @@ class ComputerSession(Base):
                             self.session_start, self.session_end, self.computer)
 
 class UserSession(Base):
+    """ User login times table """
     __tablename__ = 'user_session'
 
     id = Column(Integer, primary_key=True)

@@ -2,6 +2,7 @@
 import datetime
 
 def time_to_color(time_value):
+    """ Returns time color for report time """
     if time_value < 5:
         return "green"
     if time_value < 10:
@@ -9,6 +10,7 @@ def time_to_color(time_value):
     return "grey"
 
 def time_to_online(time_value):
+    """ Returns computer status by last report time """
     if time_value < 5:
         return "Online"
     if time_value < 10:
@@ -16,11 +18,13 @@ def time_to_online(time_value):
     return "Offline"
 
 def usage_percent(used, total):
+    """ Calculates usage percent, while preventing division by zero """
     if total == 0:
         return 0
     return int(100.0*used/total)
 
 def scratch_data(scrtch):
+    """ Outputs scratch data string """
     if scrtch:
         free = int(scrtch[2]/(1024*1024*1024))
         total = int(scrtch[1]/(1024*1024*1024))
@@ -28,6 +32,7 @@ def scratch_data(scrtch):
     return "N/A"
 
 def ansible_data(ansible):
+    """ Generates ansible status string """
     if ansible:
         return """
         <font color="green">%s</font> /
@@ -45,24 +50,25 @@ def is_ansible_ok(ansible,last_report):
     """ ansible - tuple of ansible values, [0] - timestamp
     last_report - datetime
     """
+    result = ""
     if ansible:
         delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
         delta = delta / datetime.timedelta(hours=1)
         if delta >= 12:
-            return "Нет данных"
+            result = "Нет данных"
         if int(ansible[4]) > 0:
-            return "Ошибка!"
-        return ""
-    else:
-        return ""
+            result = "Ошибка!"
+    return result
 
 
 def expand_hostname(hostname):
+    """ Appends .dcti.sut.ru to hostname if not present """
     if not hostname.endswith('.dcti.sut.ru'):
         hostname = hostname + '.dcti.sut.ru'
     return hostname
 
 def period_to_days(period):
+    """ Convert string [dwmy] to time in days. Used to decipher input parameter """
     if period == "d":
         return 1
     if period == "w":
@@ -74,6 +80,7 @@ def period_to_days(period):
     return None
 
 def get_graph_title(hostnames):
+    """ Generate title for graph or multiple graphs """
     if isinstance(hostnames, str):
         title = hostnames
         hostnames = (hostnames,)

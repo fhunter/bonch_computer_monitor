@@ -9,6 +9,7 @@ import rrd
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
+    """ Graph uptime data over specific period """
     title, hostname = get_graph_title(hostname)
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % title )
     j = 1
@@ -29,6 +30,7 @@ def graph(hostname, period):
     return test['image']
 
 def insert(hostname, data, timestamp="N"):
+    """ Insert data to uptime graph. """
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_uptime.rrd"
@@ -36,11 +38,13 @@ def insert(hostname, data, timestamp="N"):
     graph.cache_clear()
 
 def exists(hostname):
+    """ Check if rrdfile exists """
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     return os.path.exists(rrdname)
 
 
 def create(hostname):
+    """ Create rrdfile if not exists """
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_uptime.rrd"
         rrd.create(rrdname, [["uptime", 315360000],])
@@ -49,11 +53,13 @@ def create(hostname):
 
 
 def last(hostname):
+    """ Get last time when specific rrd file was updated """
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     last_time = rrd.last(rrdname)
     return last_time
 
 def latest(hostname):
+    """ Get latest set of data for specific rrd file """
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     lastupdate = rrd.latest(rrdname, ["uptime"])
     return lastupdate

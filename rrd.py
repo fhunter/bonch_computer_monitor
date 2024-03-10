@@ -22,6 +22,7 @@ def create(filename,data_limits):
     rrdtool.create(*arglist)
 
 def last(filename):
+    """ Get last time when specific rrd file was updated """
     last_time = None
     try:
         last_time = rrdtool.last(filename)
@@ -30,6 +31,7 @@ def last(filename):
     return last_time
 
 def latest(filename, data):
+    """ Get latest set of data for specific rrd file """
     try:
         info = rrdtool.info(filename)
         lastupdate = [info['last_update'],]

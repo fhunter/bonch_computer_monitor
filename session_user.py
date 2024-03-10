@@ -1,9 +1,12 @@
+""" User session functions """
+
 import datetime
 from sqlalchemy.sql import func
 from sqlalchemy import or_
-from my_db import ComputerSession, Computer, UserSession
+from my_db import Computer, UserSession
 
 def get_active_users(db_session, machineid):
+    """ Returns a list of active (currently logged in) users for specific machineid """
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     usersloggedin = (db_session.query(UserSession)
                     .filter(UserSession.session_end.is_(None))
@@ -12,6 +15,7 @@ def get_active_users(db_session, machineid):
     return list({i.username for i in usersloggedin})
 
 def get_sessions(db_session, machineid, start, end):
+    """ Returns list of user sessions for machineid that include dates between start and end """
     now = datetime.datetime.now()
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     sessions = (db_session.query(UserSession,
@@ -23,7 +27,9 @@ def get_sessions(db_session, machineid, start, end):
                .all())
     return sessions
 
-def clean_sessions(db_session): # check if any sessions are stale (close anything that is open on closed PCs
+def clean_sessions(db_session):
+    """ Runs session cleanup and closes still open sessions that do not have recent updates """
+    # check if any sessions are stale (close anything that is open on closed PCs
     time = datetime.datetime.now()
     # find all computers with more than 10 minutes since last report
     timedelta = datetime.timedelta(minutes = 10)
@@ -39,6 +45,7 @@ def clean_sessions(db_session): # check if any sessions are stale (close anythin
     db_session.commit()
 
 def close_session(db_session, machineid, user):
+    """ Close session for specific user and machineid """
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     sessions = (db_session.query(UserSession)
                .filter(UserSession.computer == computer.id)
@@ -51,9 +58,11 @@ def close_session(db_session, machineid, user):
 
 
 def update_session(db_session, machineid, users_list):
-#    # Логика:
-#    1. проверить все открытые сессии по этому компьютеру, где пользователи не в users_list, закрыть их
-#    2. если пользовательской сессии нет в списке открытых - открыть новую
+    """ Updates sessions for specific machineid to the users_list
+    __ Логика:
+    1. проверить все открытые сессии по этому компьютеру,
+       где пользователи не в users_list, закрыть их
+    2. если пользовательской сессии нет в списке открытых - открыть новую """
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     time = datetime.datetime.now()
     session = (db_session.query(UserSession)

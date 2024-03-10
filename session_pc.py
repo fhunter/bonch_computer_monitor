@@ -6,6 +6,7 @@ from my_db import ComputerSession, Computer
 
 
 def get_sessions(db_session, machineid, start, end):
+    """ Gets lists of computers currently considered being on """
     now = datetime.datetime.now()
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     sessions = (db_session.query(ComputerSession,
@@ -17,7 +18,8 @@ def get_sessions(db_session, machineid, start, end):
                .all())
     return sessions
 
-def clean_sessions(db_session): # check if any sessions are stale
+def clean_sessions(db_session):
+    """ check if any sessions are stale """
     time = datetime.datetime.now()
     # find all computers with more than 10 minutes since last report
     timedelta = datetime.timedelta(minutes = 10)
@@ -33,6 +35,7 @@ def clean_sessions(db_session): # check if any sessions are stale
     db_session.commit()
 
 def close_session(db_session, machineid):
+    """ Close session for specific machineid """
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     sessions = (db_session.query(ComputerSession)
                .filter(ComputerSession.computer == computer.id)
@@ -43,11 +46,13 @@ def close_session(db_session, machineid):
     db_session.commit()
 
 def update_session(db_session, machineid, uptime):
-    # Логика:
-    # 1. найти подходящий session с подходящим временем открытия по uptime.
-    # 1.1. если есть - продлить или переоткрыть сессию.
-    # 1.2. если нет - проверить открытые сессии,
-    # 1.2. закрыть открытые по времени последнего отчёта, создать новую.
+    """ Update certain machineid's session
+    __ Логика:
+    1. найти подходящий session с подходящим временем открытия по uptime.
+    1.1. если есть - продлить или переоткрыть сессию.
+    1.2. если нет - проверить открытые сессии,
+    1.2. закрыть открытые по времени последнего отчёта, создать новую.
+    """
     computer = db_session.query(Computer).filter(Computer.machineid == machineid).first()
     time = datetime.datetime.now()
     uptimedelta_p = datetime.timedelta(seconds = uptime + 2.5*60)
