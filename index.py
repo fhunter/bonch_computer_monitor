@@ -192,7 +192,10 @@ def acceptansibledata():
         hostname = socket.gethostbyaddr(ip_addr)[0]
     try:
         ok_value = request.json['ok']
-        change_value = request.json['change']
+        tmp = request.json.get('change',None)
+        if tmp is None:
+            tmp = request.json['changed']
+        change_value = tmp
         unreachable_value = request.json['unreachable']
         failed_value = request.json['failed']
         rrd_ansible.insert(hostname, [ok_value, change_value, unreachable_value, failed_value])
