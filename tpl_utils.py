@@ -51,13 +51,17 @@ def is_ansible_ok(ansible,last_report):
     last_report - datetime
     """
     result = ""
-    if ansible:
-        delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
-        delta = delta / datetime.timedelta(hours=1)
-        if delta >= 12:
-            result = "Нет данных"
-        if int(ansible[4]) > 0:
-            result = "Ошибка!"
+    from_last_report = (datetime.datetime.now() - last_report)/datetime.timedelta(days=1)
+    if from_last_report >= 60:
+        result = "Где компьютер?"
+    else:
+        if ansible:
+            delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
+            delta = delta / datetime.timedelta(hours=1)
+            if delta >= 12:
+                result = "Нет данных"
+            if int(ansible[4]) > 0:
+                result = "Ошибка!"
     return result
 
 
