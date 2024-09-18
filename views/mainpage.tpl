@@ -17,7 +17,7 @@
         <th rowspan=2>Последнее обновление<br/>(GMT)</th><th rowspan=2>С последнего<br/> обновления<br/>чч:мм:сс</th>
         <th rowspan=2>Статус</th><th rowspan=2>Пользователи<br/>(за 10 минут)</th>
         <th colspan=3>Использование за месяц<br/> часов:минут:секунд</th>
-        <th rowspan=2>Объём /scratch </th>
+        <th rowspan=2>Объём /scratch<br/>Свободно/Всего </th>
         <th rowspan=2 colspan=2>Отчёт<br/>Ansible</th>
     </tr>
     <tr>
