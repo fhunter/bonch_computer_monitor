@@ -59,6 +59,7 @@ def is_ansible_ok(ansible,last_report,repodate = None):
             delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
             delta = delta / datetime.timedelta(hours=1)
             if repodate:
+                last_report = pytz.UTC.localize(last_report)
                 if repodate < last_report:
                     result = "✅"
                 else:
