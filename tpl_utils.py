@@ -1,5 +1,6 @@
 """ Utility modules for templates and graphs """
 import datetime
+import pytz
 
 def time_to_color(time_value):
     """ Returns time color for report time """
