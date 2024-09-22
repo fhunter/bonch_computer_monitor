@@ -46,7 +46,7 @@ def ansible_data(ansible):
                  str(datetime.datetime.fromtimestamp(ansible[0])))
     return "N/A"
 
-def is_ansible_ok(ansible,last_report):
+def is_ansible_ok(ansible,last_report,repodate = None):
     """ ansible - tuple of ansible values, [0] - timestamp
     last_report - datetime
     """
@@ -58,6 +58,11 @@ def is_ansible_ok(ansible,last_report):
         if ansible:
             delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
             delta = delta / datetime.timedelta(hours=1)
+            if repodate:
+                if repodate < last_report:
+                    result = "✅"
+                else:
+                    result = "⌛"
             if delta >= 12:
                 result = "Нет данных"
             if int(ansible[4]) > 0:

@@ -5,6 +5,7 @@ import datetime
 import glob
 import socket
 import bottle
+import requests
 from bottle import view, request, response, redirect, static_file
 from my_db import Session, Room, UserSession, ComputerSession, Computer
 import usage
@@ -38,6 +39,16 @@ def main():
     userslog = dict()
     displaydata = {}
     timenow = datetime.datetime.now()
+
+    # fetch data from gitea
+    date = None
+    try:
+        data = requests.get("https://gitea.pivt.spbgut.ru/api/v1/repos/PIVT/bonch_ansible/branches/master", headers = {"accept": "application/json"}, timeout = 1)
+        data = data.json()
+        date = data["commit"]["timestamp"]
+        date = datetime.datetime.fromisoformat(date)
+    except:
+        pass
     for i in rooms:
         displaydata[i] = {}
         displaydata[i]['name'] = i.name
@@ -73,6 +84,7 @@ def main():
         displaydata[i]['total'] = len(result)
     return dict(data=displaydata,
                 date=timenow,
+                repodate=date,
                 online=onlinecount,
                 userslog=userslog)
 
