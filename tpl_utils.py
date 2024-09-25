@@ -1,6 +1,5 @@
 """ Utility modules for templates and graphs """
 import datetime
-import pytz
 
 def time_to_color(time_value):
     """ Returns time color for report time """
@@ -60,8 +59,7 @@ def is_ansible_ok(ansible,last_report,repodate = None):
             delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
             delta = delta / datetime.timedelta(hours=1)
             if repodate:
-                last_report = pytz.UTC.localize(last_report)
-                if repodate < last_report:
+                if repodate < last_report.astimezone():
                     result = "✅"
                 else:
                     result = "⌛"
