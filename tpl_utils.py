@@ -59,7 +59,7 @@ def is_ansible_ok(ansible,last_report,repodate = None):
             delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
             delta = delta / datetime.timedelta(hours=1)
             if repodate:
-                if repodate < last_report.astimezone():
+                if (repodate + datetime.timedelta(minutes=15)) < last_report.astimezone():
                     result = "✅"
                 else:
                     result = "⌛"
