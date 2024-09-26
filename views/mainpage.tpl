@@ -28,7 +28,10 @@
 %for i in value["values"]:
     <tr>
         <td>{{i["id"]}}</td>
-        <td><a href=./computer/{{i["machineid"]}}>{{i["ip"]}}</a><a href=./computer/{{i["machineid"]}}/edit>✏️</a></td>
+        <td>
+            <a href=./computer/{{i["machineid"]}}/edit>✏️</a>&nbsp;
+            <a href=./computer/{{i["machineid"]}}>{{i["ip"]}}</a>
+        </td>
         <td>{{i["hostname"]}}</td>
         <td>{{i["last_report"]}}</td>
         <td align=right>{{str(datetime.timedelta(seconds=int(i["since_update"]*60.0)))}}</td>
