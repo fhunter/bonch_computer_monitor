@@ -21,9 +21,17 @@ import session_user
 import computer
 import settings
 from tpl_utils import period_to_days, expand_hostname
+from utils import require_groups
 
 bottle.debug(True)
 app = application = bottle.Bottle()
+
+@app.error(403)
+def error403(error_m):
+    e_message = "<html><head>"
+    e_message += f"<meta http-equiv=\"refresh\" content=\"5; url='{settings.PREFIX}/'\" />"
+    e_message += "</head><body><h1>Unauthorised, sorry</h1></body></html>"
+    return e_message
 
 @app.route(settings.PREFIX + '/')
 @view('mainpage')
@@ -107,6 +115,36 @@ def debugfunc():
                 computers=computers,
                 computer = computer_list,
                 graphs=graphs)
+
+@app.route(settings.PREFIX +'/computer/edit/<machineid>', method='POST')
+@require_groups(settings.ALLOWED_GROUPS)
+@view('edit')
+def machineedit(machineid):
+    searchkey = request.forms.getunicode('room')
+    session = Session()
+    result = session.query(Computer).filter(Computer.machineid == machineid).first()
+    if not result:
+        redirect(settings.PREFIX + "/")
+    room = session.query(Room).filter(Room.id == int(searchkey)).first()
+    if not room:
+        redirect(settings.PREFIX + "/")
+    result.room = int(searchkey)
+    session.commit()
+    room = session.query(Room).filter(Room.id == result.room).first()
+    rooms = session.query(Room).all()
+    return dict(machineid=machineid,room=room, rooms=rooms, computer = result)
+
+@app.route(settings.PREFIX +'/computer/edit/<machineid>')
+@require_groups(settings.ALLOWED_GROUPS)
+@view('edit')
+def machineedit(machineid):
+    session = Session()
+    result = session.query(Computer).filter(Computer.machineid == machineid).first()
+    if not result:
+        redirect(settings.PREFIX + "/")
+    room = session.query(Room).filter(Room.id == result.room).first()
+    rooms = session.query(Room).all()
+    return dict(machineid=machineid,room=room, rooms=rooms, computer = result)
 
 @app.route(settings.PREFIX +'/computer/<machineid>/<period:re:[d,w,m,y]>')
 @app.route(settings.PREFIX +'/computer/<machineid>')

@@ -29,7 +29,7 @@
     <tr>
         <td>{{i["id"]}}</td>
         <td>
-            <a href=./computer/{{i["machineid"]}}/edit>✏️</a>&nbsp;
+            <a href=./computer/edit/{{i["machineid"]}}>✏️</a>&nbsp;
             <a href=./computer/{{i["machineid"]}}>{{i["ip"]}}</a>
         </td>
         <td>{{i["hostname"]}}</td>
