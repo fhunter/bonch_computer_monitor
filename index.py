@@ -8,6 +8,7 @@ import bottle
 import requests
 from bottle import view, request, response, redirect, static_file
 from my_db import Session, Room, UserSession, ComputerSession, Computer
+from sqlalchemy import desc, func
 import usage
 
 import rrd_uptime
@@ -65,6 +66,8 @@ def main():
         temp = []
         result = (session.query(Computer)
                  .filter(Computer.room == i.id)
+                 .group_by(Computer.hostname)
+                 .having(func.max(Computer.first_report))
                  .order_by(Computer.hostname)
                  .all())
         for record in result:
