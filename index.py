@@ -161,12 +161,16 @@ def machinestats2(machineid,period = 'w'):
     hostname = expand_hostname(result.hostname)
     days = period_to_days(period)
     popularity = usage.getpopularity(days, machineid)
+    samehostname = (session.query(Computer)
+            .filter(Computer.hostname == result.hostname)
+            .order_by(Computer.last_report)
+            .all())
     return dict(date=datetime.datetime.now(),
                 machine=hostname,
                 popularity=popularity,
                 attr=machineid,
                 group=False,
-                period=period)
+                period=period,samehost=samehostname)
 
 
 @app.route(settings.PREFIX +'/group/<grp>/<period:re:[d,w,m,y]>')

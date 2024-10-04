@@ -37,4 +37,18 @@
 </tr>
 %end
 </table>
+<h1>Совпадения по hostname</h1>
+<table border=1 width=50%>
+<thead><tr>
+<th>Данные</th><th>Первый отчёт</th><th>Последний отчёт</th><th>IP</th>
+</tr></thead>
+%for i in samehost:
+<tr>
+<td><a href={{settings.PREFIX}}/computer/{{i.machineid}}/{{period}}>{{i.hostname}}</a></td>
+<td>{{i.first_report}}</td>
+<td>{{i.last_report}}</td>
+<td>{{i.ip}}</td>
+</tr>
+%end
+</table>
 %include footer
