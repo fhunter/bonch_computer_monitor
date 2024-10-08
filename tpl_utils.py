@@ -28,7 +28,7 @@ def scratch_data(scrtch):
     if scrtch:
         free = int(scrtch[2]/(1024*1024*1024))
         total = int(scrtch[1]/(1024*1024*1024))
-        return "%d/%d Гб" % (free, total)
+        return "%3.0f%% (%d из %d Гб)" % (free*100.0/total,free, total)
     return "N/A"
 
 def ansible_data(ansible):
