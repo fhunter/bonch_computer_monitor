@@ -8,6 +8,9 @@
 <br/>
 Включено компьютеров: {{online}}
 <br/>
+<a href="./search/user/"><button>Поиск пользователей</button></a>
+<a href="./search/computer/"><button>Поиск компьютеров</button></a>
+<br/>
 
 %for key,value in data.items():
 <h2><a href="./group/{{value['link']}}">{{value['name']}}</a></h2>

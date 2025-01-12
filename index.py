@@ -99,6 +99,58 @@ def main():
                 online=onlinecount,
                 userslog=userslog)
 
+@app.route(settings.PREFIX + '/search/user/')
+@view('search_user')
+def search():
+    return dict(startdate="1970-01-01", enddate="2077-12-31", username = "", computername = "")
+
+@app.route(settings.PREFIX + '/search/user/', method='POST')
+@view('search_user')
+def search():
+    session = Session()
+    username = request.forms.getunicode('usernm')
+    computername = request.forms.getunicode('computername')
+    try:
+        startdate = request.forms.getunicode('startdate')
+        startdate = datetime.datetime.fromisoformat(startdate)
+        enddate = request.forms.getunicode('enddate')
+        enddate = datetime.datetime.fromisoformat(enddate)
+    except:
+        redirect(settings.PREFIX + "/search/user/")
+    result = session.query(UserSession, Computer).join(Computer, Computer.id == UserSession.computer)
+    result = result.filter(UserSession.username.like("%%%s%%" % username))
+    result = result.filter(Computer.hostname.like("%%%s%%" % computername))
+    result = result.filter(UserSession.session_start <= enddate)
+    result = result.filter(UserSession.session_end >= startdate)
+    result = result.all()
+    session.close()
+    return dict(query=result, startdate=startdate.strftime("%Y-%m-%d"), enddate=enddate.strftime("%Y-%m-%d"), username = username, computername = computername)
+
+@app.route(settings.PREFIX + '/search/computer/')
+@view('search_computer')
+def search():
+    return dict(startdate="1970-01-01", enddate="2077-12-31", computername = "")
+
+@app.route(settings.PREFIX + '/search/computer/', method='POST')
+@view('search_computer')
+def search():
+    session = Session()
+    computername = request.forms.getunicode('computername')
+    try:
+        startdate = request.forms.getunicode('startdate')
+        startdate = datetime.datetime.fromisoformat(startdate)
+        enddate = request.forms.getunicode('enddate')
+        enddate = datetime.datetime.fromisoformat(enddate)
+    except:
+        redirect(settings.PREFIX + "/search/computer/")
+    result = session.query(ComputerSession, Computer).join(Computer, Computer.id == ComputerSession.computer)
+    result = result.filter(Computer.hostname.like("%%%s%%" % computername))
+    result = result.filter(ComputerSession.session_start <= enddate)
+    result = result.filter(ComputerSession.session_end >= startdate)
+    result = result.all()
+    session.close()
+    return dict(query=result, startdate=startdate.strftime("%Y-%m-%d"), enddate=enddate.strftime("%Y-%m-%d"), computername = computername)
+
 @app.route(settings.PREFIX + '/debug/')
 @view('debug')
 def debugfunc():
