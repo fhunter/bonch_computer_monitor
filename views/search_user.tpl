@@ -33,7 +33,14 @@
 <table border=1>
 <tr><th>Компьютер</th><th>Пользователь</th><th>Начало</th><th>Конец</th><th>Длительность</th></td>
 %for i in query:
-<tr><td>{{i[1].hostname}}</td><td>{{i[0].username}}</td><td>{{i[0].session_start}}</td><td>{{i[0].session_end}}</td><td>{{i[0].session_end - i[0].session_start}}</td></tr>
+<tr><td>{{i[1].hostname}}</td><td>{{i[0].username}}</td><td>{{i[0].session_start}}</td><td>{{i[0].session_end}}</td>
+<td>
+%if i[0].session_end:
+    {{i[0].session_end - i[0].session_start}}
+%else:
+    {{datetime.datetime.now() - i[0].session_start}}
+%end
+</td></tr>
 %end
 </table>
 %end
