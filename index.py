@@ -8,7 +8,7 @@ import bottle
 import requests
 from bottle import view, request, response, redirect, static_file
 from my_db import Session, Room, UserSession, ComputerSession, Computer
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 import usage
 
 import rrd_uptime
@@ -117,11 +117,15 @@ def search():
         enddate = datetime.datetime.fromisoformat(enddate)
     except:
         redirect(settings.PREFIX + "/search/user/")
+    now = datetime.datetime.today()
     result = session.query(UserSession, Computer).join(Computer, Computer.id == UserSession.computer)
     result = result.filter(UserSession.username.like("%%%s%%" % username))
     result = result.filter(Computer.hostname.like("%%%s%%" % computername))
     result = result.filter(UserSession.session_start <= enddate)
-    result = result.filter(UserSession.session_end >= startdate)
+    if enddate >= now:
+        result = result.filter(or_(ComputerSession.session_end >=startdate, ComputerSession.session_end == None))
+    else:
+        result = result.filter(ComputerSession.session_end >= startdate)
     result = result.all()
     session.close()
     return dict(query=result, startdate=startdate.strftime("%Y-%m-%d"), enddate=enddate.strftime("%Y-%m-%d"), username = username, computername = computername)
@@ -143,10 +147,14 @@ def search():
         enddate = datetime.datetime.fromisoformat(enddate)
     except:
         redirect(settings.PREFIX + "/search/computer/")
+    now = datetime.datetime.now()
     result = session.query(ComputerSession, Computer).join(Computer, Computer.id == ComputerSession.computer)
     result = result.filter(Computer.hostname.like("%%%s%%" % computername))
     result = result.filter(ComputerSession.session_start <= enddate)
-    result = result.filter(ComputerSession.session_end >= startdate)
+    if enddate >= now:
+        result = result.filter(or_(ComputerSession.session_end >=startdate, ComputerSession.session_end == None))
+    else:
+        result = result.filter(ComputerSession.session_end >= startdate)
     result = result.all()
     session.close()
     return dict(query=result, startdate=startdate.strftime("%Y-%m-%d"), enddate=enddate.strftime("%Y-%m-%d"), computername = computername)
