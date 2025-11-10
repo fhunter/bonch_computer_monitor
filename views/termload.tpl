@@ -9,7 +9,7 @@
 %for i in servers:
 <tr>
     <td>{{i["name"]}}</td>
-    <td align=right>{{i["load"][2]}}</td>
+    <td align=center>{{i["load"][2]}}</td>
     <td align=right>{{i["users"]}}</td>
 </tr>
 %end
