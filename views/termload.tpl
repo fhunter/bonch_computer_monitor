@@ -3,13 +3,15 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf8">
 <meta http-equiv="refresh" content="30" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="style.css" />
 </head><body>
-<h1>Нагрузка на терминальные сервера</h1>
-<table>
-<tr><td>Сервер</td><td>Load avg</td><td>Пользователей</td></tr>
+<table width=100%>
+<tr><td width=*>Сервер</td><td width=30%>Load avg</td><td width=15% align=right>Пользователей</td></tr>
 %for i in servers:
-<tr><td>{{i["name"]}}</td><td>{{i["load"]}}</td><td>{{i["users"]}}</td></tr>
+<tr>
+    <td>{{i["name"]}}</td>
+    <td align=right>{{i["load"][2]}}</td>
+    <td align=right>{{i["users"]}}</td>
+</tr>
 %end
 </table>
 </body>

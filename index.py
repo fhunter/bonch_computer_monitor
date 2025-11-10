@@ -194,7 +194,7 @@ def termserverstatus():
     for record in result:
         t = {'name': record.hostname}
         t["users"] = len(session_user.get_active_users(session, record.machineid))
-        t["load"] = rrd_cpu.last(record.hostname + ".dcti.sut.ru")
+        t["load"] = rrd_cpu.latest(record.hostname + ".dcti.sut.ru")
         servers.append(t)
     return dict(servers=servers)
 
