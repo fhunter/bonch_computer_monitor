@@ -179,6 +179,25 @@ def debugfunc():
                 computer = computer_list,
                 graphs=graphs)
 
+@app.route(settings.PREFIX + '/termload/')
+@view('termload')
+def termserverstatus():
+    """ Shows cpu load and user count on terminal servers """
+    servers = []
+    session = Session()
+    result = (session.query(Computer)
+             .filter(Computer.hostname.in_(settings.TERMSERVRES))
+             .group_by(Computer.hostname)
+             .having(func.max(Computer.first_report))
+             .order_by(Computer.hostname)
+             .all())
+    for record in result:
+        t = {'name': record.hostname}
+        t["users"] = len(session_user.get_active_users(session, record.machineid))
+        t["load"] = rrd_cpu.last(record.hostname + ".dcti.sut.ru")
+        servers.append(t)
+    return dict(servers=servers)
+
 @app.route(settings.PREFIX +'/computer/edit/<machineid>', method='POST')
 @require_groups(settings.ALLOWED_GROUPS)
 @view('edit')
