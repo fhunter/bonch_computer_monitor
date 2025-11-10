@@ -186,7 +186,7 @@ def termserverstatus():
     servers = []
     session = Session()
     result = (session.query(Computer)
-             .filter(Computer.hostname.in_(settings.TERMSERVRES))
+             .filter(Computer.hostname.in_(settings.TERMSERVERS))
              .group_by(Computer.hostname)
              .having(func.max(Computer.first_report))
              .order_by(Computer.hostname)
