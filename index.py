@@ -102,7 +102,10 @@ def main():
 @app.route(settings.PREFIX + '/search/user/')
 @view('search_user')
 def search():
-    return dict(startdate="1970-01-01", enddate="2077-12-31", username = "", computername = "")
+    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    session = Session()
+    start_date = session.query(UserSession.session_start).order_by(UserSession.session_start.asc()).limit(1).one()[0].strftime("%Y-%m-%d")
+    return dict(startdate=start_date, enddate=today, username = "", computername = "")
 
 @app.route(settings.PREFIX + '/search/user/', method='POST')
 @view('search_user')
@@ -133,7 +136,10 @@ def search():
 @app.route(settings.PREFIX + '/search/computer/')
 @view('search_computer')
 def search():
-    return dict(startdate="1970-01-01", enddate="2077-12-31", computername = "")
+    session = Session()
+    start_date = session.query(ComputerSession.session_start).order_by(ComputerSession.session_start.asc()).limit(1).one()[0].strftime("%Y-%m-%d")
+    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    return dict(startdate=start_date, enddate=today, computername = "")
 
 @app.route(settings.PREFIX + '/search/computer/', method='POST')
 @view('search_computer')
