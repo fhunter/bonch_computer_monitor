@@ -154,13 +154,15 @@ def search():
     except:
         redirect(settings.PREFIX + "/search/computer/")
     now = datetime.datetime.now()
+    end_none = now + datetime.timedelta(365) # year forward
     result = session.query(ComputerSession, Computer).join(Computer, Computer.id == ComputerSession.computer)
-    result = result.filter(Computer.hostname.like("%%%s%%" % computername))
-    result = result.filter(ComputerSession.session_start <= enddate)
-    if enddate >= now:
-        result = result.filter(or_(ComputerSession.session_end >=startdate, ComputerSession.session_end == None))
-    else:
-        result = result.filter(ComputerSession.session_end >= startdate)
+    result = result.filter(Computer.hostname.like("%%%s%%" % computername)) # filter by name
+    result = result.filter(ComputerSession.session_start <= enddate) # start must be before end date
+    result = result.filter(func.coalesce(ComputerSession.session_end, end_none) >= startdate)
+#    if enddate >= now:
+#        result = result.filter(or_(ComputerSession.session_end >=startdate, ComputerSession.session_end == None))
+#    else:
+#        result = result.filter(ComputerSession.session_end >= startdate)
     result = result.all()
     session.close()
     return dict(query=result, startdate=startdate.strftime("%Y-%m-%d"), enddate=enddate.strftime("%Y-%m-%d"), computername = computername)
