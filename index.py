@@ -102,7 +102,9 @@ def main():
 @app.route(settings.PREFIX + '/search/user/')
 @view('search_user')
 def search():
-    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    today = datetime.datetime.today()
+    today = today + datetime.timedelta(1)
+    today = today.strftime("%Y-%m-%d")
     session = Session()
     start_date = session.query(UserSession.session_start).order_by(UserSession.session_start.asc()).limit(1).one()[0].strftime("%Y-%m-%d")
     return dict(startdate=start_date, enddate=today, username = "", computername = "")
@@ -127,10 +129,6 @@ def search():
     result = result.filter(Computer.hostname.like("%%%s%%" % computername))
     result = result.filter(UserSession.session_start <= enddate)
     result = result.filter(func.coalesce(UserSession.session_end, end_none) >= startdate)
-#    if enddate >= now:
-#        result = result.filter(or_(ComputerSession.session_end >=startdate, ComputerSession.session_end == None))
-#    else:
-#        result = result.filter(ComputerSession.session_end >= startdate)
     result = result.all()
     session.close()
     return dict(query=result, startdate=startdate.strftime("%Y-%m-%d"), enddate=enddate.strftime("%Y-%m-%d"), username = username, computername = computername)
@@ -140,7 +138,9 @@ def search():
 def search():
     session = Session()
     start_date = session.query(ComputerSession.session_start).order_by(ComputerSession.session_start.asc()).limit(1).one()[0].strftime("%Y-%m-%d")
-    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    today = datetime.datetime.today()
+    today = today + datetime.timedelta(1)
+    today = today.strftime("%Y-%m-%d")
     return dict(startdate=start_date, enddate=today, computername = "")
 
 @app.route(settings.PREFIX + '/search/computer/', method='POST')
