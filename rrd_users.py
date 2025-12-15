@@ -22,13 +22,19 @@ def graph(hostname, period):
         rrd_file = Path("rrds/%s_uptime.rrd" % i)
         if not rrd_file.exists():
             continue
+        if j == 1:
+            line = "AREA"
+        else:
+            line = "STACK"
+        color = (j * 12) % 256
+        color2 = (256 - j * 12) % 256
         new_arglist = (
             "DEF:users_%d=rrds/%s_users.rrd:users:MAX" % (j,i),
             "DEF:usersa_%d=rrds/%s_users.rrd:users:AVERAGE" % (j,i) ,
             "DEF:uptime_%d=rrds/%s_uptime.rrd:uptime:LAST" % (j,i) ,
             "CDEF:users_m_%d=users_%d,UN,0,users_%d,IF" % (j,j,j),
-            "LINE2:users_m_%d#0000FF:Users max %s" % (j,i),
-            "LINE2:usersa_%d#00FFFF:Users average %s" % (j,i),
+            f"{line}:users_m_{j}#00{color2:02x}{color:02x}:Users max {i}"
+#            "LINE2:usersa_%d#00FFFF:Users average %s" % (j,i),
         )
         arglist = arglist + new_arglist
         j = j + 1
