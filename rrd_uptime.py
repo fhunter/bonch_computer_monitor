@@ -1,7 +1,7 @@
-""" Module for manipulating uptime statistics in RRD database files """
+"""Module for manipulating uptime statistics in RRD database files"""
+
 import os
 from functools import lru_cache
-from pathlib import Path
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
@@ -10,17 +10,16 @@ import rrd
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
-    """ Graph uptime data over specific period """
+    """Graph uptime data over specific period"""
     title, hostname = get_graph_title(hostname)
-    arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % title )
+    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Uptime {title}")
     j = 1
     for i in hostname:
-        rrd_file = Path("rrds/%s_uptime.rrd" % i)
-        if not rrd_file.exists():
+        if not exists(i):
             continue
         new_arglist = (
-            "DEF:uptime_%d=rrds/%s_uptime.rrd:uptime:LAST" % (j,i),
-            "LINE1:uptime_%d#0000FF:Uptime %s" % (j, i),
+            f"DEF:uptime_{j}=rrds/{i}_uptime.rrd:uptime:LAST",
+            f"LINE1:uptime_{j}#0000FF:Uptime {i}",
         )
         arglist = arglist + new_arglist
         j = j + 1
@@ -31,39 +30,47 @@ def graph(hostname, period):
         )
     test = rrdtool.graphv(*arglist)
 
-    return test['image']
+    return test["image"]
+
 
 def insert(hostname, data, timestamp="N"):
-    """ Insert data to uptime graph. """
+    """Insert data to uptime graph."""
     if not exists(hostname):
         create(hostname)
     rrdname = "rrds/" + hostname + "_uptime.rrd"
-    rrdtool.update(rrdname, '%s:%s' % (timestamp, data[0]))
+    rrdtool.update(rrdname, f"{timestamp}:{data[0]}")
     graph.cache_clear()
 
+
 def exists(hostname):
-    """ Check if rrdfile exists """
+    """Check if rrdfile exists"""
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     return os.path.exists(rrdname)
 
 
 def create(hostname):
-    """ Create rrdfile if not exists """
+    """Create rrdfile if not exists"""
     if not exists(hostname):
         rrdname = "rrds/" + hostname + "_uptime.rrd"
-        rrd.create(rrdname, [["uptime", 315360000],])
+        rrd.create(
+            rrdname,
+            [
+                ["uptime", 315360000],
+            ],
+        )
         return True
     return False
 
 
 def last(hostname):
-    """ Get last time when specific rrd file was updated """
+    """Get last time when specific rrd file was updated"""
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     last_time = rrd.last(rrdname)
     return last_time
 
+
 def latest(hostname):
-    """ Get latest set of data for specific rrd file """
+    """Get latest set of data for specific rrd file"""
     rrdname = "rrds/" + hostname + "_uptime.rrd"
     lastupdate = rrd.latest(rrdname, ["uptime"])
     return lastupdate

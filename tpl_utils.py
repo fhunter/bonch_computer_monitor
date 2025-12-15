@@ -1,57 +1,72 @@
-""" Utility modules for templates and graphs """
+"""Utility modules for templates and graphs"""
+
 import datetime
+import colorsys
+
+
+def getcolor(num, number):
+    """produce spaced color on color wheel our of number colors"""
+    t = colorsys.hsv_to_rgb(num / number, 1, 1)
+    t = [int(x * 255) for x in t]
+    t = [f"{x:02x}" for x in t]
+    return "".join(t)
+
 
 def time_to_color(time_value):
-    """ Returns time color for report time """
+    """Returns time color for report time"""
     if time_value < 5:
         return "green"
     if time_value < 10:
         return "orange"
     return "grey"
 
+
 def time_to_online(time_value):
-    """ Returns computer status by last report time """
+    """Returns computer status by last report time"""
     if time_value < 5:
         return "Online"
     if time_value < 10:
         return "Delay"
     return "Offline"
 
+
 def usage_percent(used, total):
-    """ Calculates usage percent, while preventing division by zero """
+    """Calculates usage percent, while preventing division by zero"""
     if total == 0:
         return 0
-    return int(100.0*used/total)
+    return int(100.0 * used / total)
+
 
 def scratch_data(scrtch):
-    """ Outputs scratch data string """
+    """Outputs scratch data string"""
     if scrtch:
-        free = int(scrtch[2]/(1024*1024*1024))
-        total = int(scrtch[1]/(1024*1024*1024))
-        return "%3.0f%% (%d из %d Гб)" % (free*100.0/total,free, total)
+        free = int(scrtch[2] / (1024 * 1024 * 1024))
+        total = int(scrtch[1] / (1024 * 1024 * 1024))
+        percent = free * 100.0 / total
+        return f"{percent:3.0f}% ({free} из {total} Гб)"
     return "N/A"
+
 
 def ansible_data(ansible):
-    """ Generates ansible status string """
+    """Generates ansible status string"""
     if ansible:
-        return """
-        <font color="green">%s</font> /
-        <font color="orange">%s</font> /
-        <font color="black">%s</font> /
-        <font color="red">%s</font>&nbsp
-        %s""" % (ansible[1],
-                 ansible[2],
-                 ansible[3],
-                 ansible[4],
-                 str(datetime.datetime.fromtimestamp(ansible[0])))
+        return f"""
+        <font color="green">{ansible[1]}</font> /
+        <font color="orange">{ansible[2]}</font> /
+        <font color="black">{ansible[3]}</font> /
+        <font color="red">{ansible[4]}</font>&nbsp
+        {str(datetime.datetime.fromtimestamp(ansible[0]))}"""
     return "N/A"
 
-def is_ansible_ok(ansible,last_report,repodate = None):
-    """ ansible - tuple of ansible values, [0] - timestamp
+
+def is_ansible_ok(ansible, last_report, repodate=None):
+    """ansible - tuple of ansible values, [0] - timestamp
     last_report - datetime
     """
     result = ""
-    from_last_report = (datetime.datetime.now() - last_report)/datetime.timedelta(days=1)
+    from_last_report = (datetime.datetime.now() - last_report) / datetime.timedelta(
+        days=1
+    )
     if from_last_report >= 60:
         result = "Где компьютер?"
     else:
@@ -59,7 +74,9 @@ def is_ansible_ok(ansible,last_report,repodate = None):
             delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
             delta = delta / datetime.timedelta(hours=1)
             if repodate:
-                if (repodate + datetime.timedelta(minutes=15)) < last_report.astimezone():
+                if (
+                    repodate + datetime.timedelta(minutes=15)
+                ) < last_report.astimezone():
                     result = "✅"
                 else:
                     result = "⌛"
@@ -71,13 +88,14 @@ def is_ansible_ok(ansible,last_report,repodate = None):
 
 
 def expand_hostname(hostname):
-    """ Appends .dcti.sut.ru to hostname if not present """
-    if not hostname.endswith('.dcti.sut.ru'):
-        hostname = hostname + '.dcti.sut.ru'
+    """Appends .dcti.sut.ru to hostname if not present"""
+    if not hostname.endswith(".dcti.sut.ru"):
+        hostname = hostname + ".dcti.sut.ru"
     return hostname
 
+
 def period_to_days(period):
-    """ Convert string [dwmy] to time in days. Used to decipher input parameter """
+    """Convert string [dwmy] to time in days. Used to decipher input parameter"""
     if period == "d":
         return 1
     if period == "w":
@@ -88,8 +106,9 @@ def period_to_days(period):
         return 365
     return None
 
+
 def get_graph_title(hostnames):
-    """ Generate title for graph or multiple graphs """
+    """Generate title for graph or multiple graphs"""
     if isinstance(hostnames, str):
         title = hostnames
         hostnames = (hostnames,)
