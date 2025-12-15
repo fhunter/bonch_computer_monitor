@@ -21,8 +21,8 @@ def graph(hostname, period):
         new_arglist = (
             "DEF:free_%d=rrds/%s_scratch.rrd:free:LAST" % (j, i) ,
             "DEF:total_%d=rrds/%s_scratch.rrd:total:LAST" % (j,i) ,
-            "LINE2:total_%d#009F00:Total %s" % (j, i),
-            "LINE2:free_%d#FF00FF:Free %s" % (j, i),
+            "AREA:total_%d#009F00:Total %s" % (j, i),
+            "AREA:free_%d#FF00FF:Free %s" % (j, i),
         )
         arglist = arglist + new_arglist
         j = j + 1
