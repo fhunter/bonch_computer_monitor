@@ -7,8 +7,8 @@ import socket
 import bottle
 import requests
 from bottle import view, request, response, redirect, static_file
+from sqlalchemy import func
 from my_db import Session, Room, UserSession, ComputerSession, Computer
-from sqlalchemy import desc, func, or_
 import usage
 
 import rrd_uptime
@@ -30,6 +30,8 @@ app = application = bottle.Bottle()
 
 @app.error(403)
 def error403(error_m):
+    """Error 403 handler"""
+    del error_m
     e_message = "<html><head>"
     e_message += (
         f'<meta http-equiv="refresh" content="5; url=\'{settings.PREFIX}/\'" />'
@@ -51,7 +53,7 @@ def main():
         .count()
     )
     rooms = session.query(Room).order_by(Room.name).all()
-    userslog = dict()
+    userslog = {}
     displaydata = {}
     timenow = datetime.datetime.now()
 
@@ -120,7 +122,8 @@ def main():
 
 @app.route(settings.PREFIX + "/search/user/")
 @view("search_user")
-def search():
+def search_get():
+    """Search for user sessions handler"""
     today = datetime.datetime.today()
     today = today + datetime.timedelta(1)
     today = today.strftime("%Y-%m-%d")
@@ -137,7 +140,8 @@ def search():
 
 @app.route(settings.PREFIX + "/search/user/", method="POST")
 @view("search_user")
-def search():
+def search_post():
+    """Search for user sessions handler"""
     session = Session()
     username = request.forms.getunicode("usernm")
     computername = request.forms.getunicode("computername")
@@ -153,8 +157,8 @@ def search():
     result = session.query(UserSession, Computer).join(
         Computer, Computer.id == UserSession.computer
     )
-    result = result.filter(UserSession.username.like("%%%s%%" % username))
-    result = result.filter(Computer.hostname.like("%%%s%%" % computername))
+    result = result.filter(UserSession.username.like(f"%%{username}%%"))
+    result = result.filter(Computer.hostname.like(f"%%{computername}%%"))
     result = result.filter(UserSession.session_start <= enddate)
     result = result.filter(
         func.coalesce(UserSession.session_end, end_none) >= startdate
@@ -172,7 +176,8 @@ def search():
 
 @app.route(settings.PREFIX + "/search/computer/")
 @view("search_computer")
-def search():
+def search_computer_get():
+    """Search computer sessions handler"""
     session = Session()
     start_date = (
         session.query(ComputerSession.session_start)
@@ -189,7 +194,8 @@ def search():
 
 @app.route(settings.PREFIX + "/search/computer/", method="POST")
 @view("search_computer")
-def search():
+def search_computer_post():
+    """Search computer sessions handler"""
     session = Session()
     computername = request.forms.getunicode("computername")
     try:
@@ -205,7 +211,7 @@ def search():
         Computer, Computer.id == ComputerSession.computer
     )
     result = result.filter(
-        Computer.hostname.like("%%%s%%" % computername)
+        Computer.hostname.like(f"%%{computername}%%")
     )  # filter by name
     result = result.filter(
         ComputerSession.session_start <= enddate
@@ -273,7 +279,8 @@ def termserverstatus():
 @app.route(settings.PREFIX + "/computer/edit/<machineid>", method="POST")
 @require_groups(settings.ALLOWED_GROUPS)
 @view("edit")
-def machineedit(machineid):
+def machineedit_post(machineid):
+    """Change computer's room"""
     searchkey = request.forms.getunicode("room")
     session = Session()
     result = session.query(Computer).filter(Computer.machineid == machineid).first()
@@ -292,7 +299,8 @@ def machineedit(machineid):
 @app.route(settings.PREFIX + "/computer/edit/<machineid>")
 @require_groups(settings.ALLOWED_GROUPS)
 @view("edit")
-def machineedit(machineid):
+def machineedit_get(machineid):
+    """Change computer's room"""
     session = Session()
     result = session.query(Computer).filter(Computer.machineid == machineid).first()
     if not result:
@@ -406,7 +414,7 @@ def graphs_func(hostname, typ, grp, period="w"):
     elif typ == "ansible":
         result = rrd_ansible.graph(hostname, period)
     response.set_header("Content-type", "image/png")
-    response.set_header("Cache-control", "max-age=%s,public" % age)
+    response.set_header("Cache-control", f"max-age={age},public")
     return result
 
 
