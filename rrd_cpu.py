@@ -1,6 +1,7 @@
 """ Module for manipulating cpu load statistics in RRD database files """
 import os
 from functools import lru_cache
+from pathlib import Path
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
@@ -14,6 +15,9 @@ def graph1(hostname, period):
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_cpu.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:load_%d=rrds/%s_cpu.rrd:load:MAX" % (j,i),
             "CDEF:load100_%d=load_%d,100,/" % (j,j),
