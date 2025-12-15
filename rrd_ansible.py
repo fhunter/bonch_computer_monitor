@@ -2,6 +2,7 @@
 
 import os
 from functools import lru_cache
+from pathlib import Path
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
@@ -15,6 +16,9 @@ def graph(hostname, period):
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Ansible %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_ansible.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:ok_%d=rrds/%s_ansible.rrd:ok:LAST" % (j,i),
             "DEF:change_%d=rrds/%s_ansible.rrd:change:LAST" % (j,i),

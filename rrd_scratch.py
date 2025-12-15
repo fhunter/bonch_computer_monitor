@@ -1,6 +1,7 @@
 """ Module for manipulating free and used space statistics on /scratch in RRD database files """
 import os
 from functools import lru_cache
+from pathlib import Path
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
@@ -14,6 +15,9 @@ def graph(hostname, period):
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=/scratch %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_scratch.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:free_%d=rrds/%s_scratch.rrd:free:LAST" % (j, i) ,
             "DEF:total_%d=rrds/%s_scratch.rrd:total:LAST" % (j,i) ,

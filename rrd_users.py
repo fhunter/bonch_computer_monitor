@@ -1,6 +1,7 @@
 """ Module for manipulating user count statistics in RRD database files """
 import os
 from functools import lru_cache
+from pathlib import Path
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
@@ -15,6 +16,12 @@ def graph(hostname, period):
                "-w 800", "--title=User count %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_users.rrd" % i)
+        if not rrd_file.exists():
+            continue
+        rrd_file = Path("rrds/%s_uptime.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:users_%d=rrds/%s_users.rrd:users:MAX" % (j,i),
             "DEF:usersa_%d=rrds/%s_users.rrd:users:AVERAGE" % (j,i) ,
@@ -41,6 +48,12 @@ def graph2(hostname, period):
                "-w 800", "--title=CPU load per user %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_users.rrd" % i)
+        if not rrd_file.exists():
+            continue
+        rrd_file = Path("rrds/%s_cpu.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:users_%d=rrds/%s_users.rrd:users:MAX" % (j, i) ,
             "DEF:usersa_%d=rrds/%s_users.rrd:users:AVERAGE" % (j, i) ,

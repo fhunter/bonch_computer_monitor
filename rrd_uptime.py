@@ -1,6 +1,7 @@
 """ Module for manipulating uptime statistics in RRD database files """
 import os
 from functools import lru_cache
+from pathlib import Path
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
@@ -14,6 +15,9 @@ def graph(hostname, period):
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Uptime %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_uptime.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:uptime_%d=rrds/%s_uptime.rrd:uptime:LAST" % (j,i),
             "LINE1:uptime_%d#0000FF:Uptime %s" % (j, i),
