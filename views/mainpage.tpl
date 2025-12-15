@@ -13,6 +13,7 @@
 <br/>
 
 %for key,value in data.items():
+%if value["values"]:
 <h2><a href="./group/{{value['link']}}">{{value['name']}}</a></h2>
 <table border=1>
     <tr>
@@ -54,5 +55,6 @@
     <tr><td colspan=13><hr/></td></tr>
     <tr><td colspan=2></td><td>Всего:</td><td>{{value["total"]}}</td><td>Включено:</td><td>{{online}}</td></tr>
 </table>
+%end
 %end
 %include footer
