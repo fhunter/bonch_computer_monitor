@@ -40,6 +40,9 @@ def graph2(hostname, period):
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_cpu.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:cores_%d=rrds/%s_cpu.rrd:cores:LAST" % (j,i),
             "LINE2:cores_%d#00FFFF:cores %s" % (j,i),
@@ -61,6 +64,9 @@ def graph3(hostname, period):
     arglist = ("-", "--start", period_conv(period), "-w 800", "--title=Load %s" % title )
     j = 1
     for i in hostname:
+        rrd_file = Path("rrds/%s_cpu.rrd" % i)
+        if not rrd_file.exists():
+            continue
         new_arglist = (
             "DEF:loadavg_%d=rrds/%s_cpu.rrd:loadavg:LAST" % (j,i),
             "LINE2:loadavg_%d#FF00FF:loadavg %s" % (j,i),
