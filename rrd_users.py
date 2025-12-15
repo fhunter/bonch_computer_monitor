@@ -10,6 +10,8 @@ import rrd
 
 def getcolor(num, number):
     """ produce spaced color on color wheel our of number colors """
+    if(number < 10):
+        number = 10
     t = colorsys.hsv_to_rgb(num/number, 1, 1)
     t = [int(x*255) for x in t]
     t = [f"{x:02x}" for x in t]
