@@ -2,11 +2,18 @@
 import os
 from functools import lru_cache
 from pathlib import Path
+import colorsys
 import rrdtool
 from period import period_conv
 from tpl_utils import get_graph_title
 import rrd
 
+def getcolor(num, number):
+    """ produce spaced color on color wheel our of number colors """
+    t = colorsys.hsv_to_rgb(num/number, 1, 1)
+    t = [int(x*256) for x in t]
+    t = [f"{{x:02x}}" for x in t]
+    return "".join(t)
 
 @lru_cache(maxsize=128)
 def graph(hostname, period):
@@ -15,6 +22,7 @@ def graph(hostname, period):
     arglist = ("-", "--start", period_conv(period),
                "-w 800", "--title=User count %s" % title )
     j = 1
+    length = len(hostname)
     for i in hostname:
         rrd_file = Path("rrds/%s_users.rrd" % i)
         if not rrd_file.exists():
@@ -26,14 +34,13 @@ def graph(hostname, period):
             line = "AREA"
         else:
             line = "STACK"
-        color = (j * 12) % 256
-        color2 = (256 - j * 12) % 256
+        color = getcolor(j-1, length)
         new_arglist = (
             "DEF:users_%d=rrds/%s_users.rrd:users:MAX" % (j,i),
             "DEF:usersa_%d=rrds/%s_users.rrd:users:AVERAGE" % (j,i) ,
             "DEF:uptime_%d=rrds/%s_uptime.rrd:uptime:LAST" % (j,i) ,
             "CDEF:users_m_%d=users_%d,UN,0,users_%d,IF" % (j,j,j),
-            f"{line}:users_m_{j}#00{color2:02x}{color:02x}:Users max {i}"
+            f"{line}:users_m_{j}#{color}:Users max {i}"
 #            "LINE2:usersa_%d#00FFFF:Users average %s" % (j,i),
         )
         arglist = arglist + new_arglist
