@@ -17,7 +17,7 @@ def graph(hostname, period):
         "--start",
         period_conv(period),
         "-w 800",
-        "--lower-limit 0"
+        "--lower-limit 0",
         f"--title=/scratch {title}",
     )
     j = 1
