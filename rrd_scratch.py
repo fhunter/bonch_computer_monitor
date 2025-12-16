@@ -28,21 +28,21 @@ def graph(hostname, period):
             line = "AREA"
         else:
             line = "STACK"
-        if length != 1:
-            color = getcolor(j - 1, length)
-        else:
+        if length == 1:
             color = "009F00"
+        else:
+            color = getcolor(j - 1, length)
         new_arglist = (
             f"DEF:free_{j}=rrds/{i}_scratch.rrd:free:LAST",
             f"DEF:total_{j}=rrds/{i}_scratch.rrd:total:LAST",
             f"CDEF:used_{j}=total_{j},free_{j},-",
             f"{line}:free_{j}#{color}:Free {i}"
         )
-        if length != 1:
-        new_arglist = new_arglist + (
-            f"STACK:used_{j}#FF0000:Used {i}",
-            f"LINE1:total_{j}#000000:Total {i}",
-        )
+        if length == 1:
+            new_arglist = new_arglist + (
+                f"STACK:used_{j}#FF0000:Used {i}",
+                f"LINE1:total_{j}#000000:Total {i}",
+            )
         arglist = arglist + new_arglist
         j = j + 1
     if len(hostname) == 1:
