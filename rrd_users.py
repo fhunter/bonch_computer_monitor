@@ -64,12 +64,14 @@ def graph2(hostname, period):
         f"--title=CPU load per user {title}",
     )
     j = 1
+    length = len(hostname)
     for i in hostname:
         if not exists(i):
             continue
         rrd_file = Path(f"rrds/{i}_cpu.rrd")
         if not rrd_file.exists():
             continue
+        color = getcolor(j - 1, length)
         new_arglist = (
             f"DEF:users_{j}=rrds/{i}_users.rrd:users:MAX",
             f"DEF:usersa_{j}=rrds/{i}_users.rrd:users:AVERAGE",
@@ -77,7 +79,7 @@ def graph2(hostname, period):
             f"CDEF:users_m_{j}=users_{j},UN,0,users_{j},IF",
             f"CDEF:loadperuser1_{j}=load_{j},users_m_{j},/",
             f"CDEF:loadperuser_{j}=users_m_{j},1,GE,loadperuser1_{j},0,IF",
-            f"LINE2:loadperuser_{j}#00FFFF:CPU load per user {i}",
+            f"LINE2:loadperuser_{j}#{color}:CPU load per user {i}",
         )
         arglist = arglist + new_arglist
         j = j + 1
