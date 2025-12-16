@@ -4,7 +4,7 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
-from tpl_utils import get_graph_title
+from tpl_utils import get_graph_title, getcolor
 import rrd
 
 
@@ -20,15 +20,27 @@ def graph(hostname, period):
         f"--title=/scratch {title}",
     )
     j = 1
+    length = len(hostname)
     for i in hostname:
         if not exists(i):
             continue
+        if j == 1:
+            line = "AREA"
+        else:
+            line = "STACK"
+        if length != 1:
+            color = getcolor(j - 1, length)
+        else:
+            color = "009F00"
         new_arglist = (
             f"DEF:free_{j}=rrds/{i}_scratch.rrd:free:LAST",
             f"DEF:total_{j}=rrds/{i}_scratch.rrd:total:LAST",
             f"CDEF:used_{j}=total_{j},free_{j},-",
-            f"AREA:used_{j}#FF0000:Used {i}",
-            f"STACK:free_{j}#009F00:Free {i}",
+            f"{line}:free_{j}#{color}:Free {i}"
+        )
+        if length != 1:
+        new_arglist = new_arglist + (
+            f"STACK:used_{j}#FF0000:Used {i}",
             f"LINE1:total_{j}#000000:Total {i}",
         )
         arglist = arglist + new_arglist
