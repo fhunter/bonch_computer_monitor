@@ -35,13 +35,15 @@ def graph(hostname, period):
         new_arglist = (
             f"DEF:free_{j}=rrds/{i}_scratch.rrd:free:LAST",
             f"DEF:total_{j}=rrds/{i}_scratch.rrd:total:LAST",
-            f"CDEF:used_{j}=total_{j},free_{j},-",
-            f"{line}:free_{j}#{color}:Free {i}"
+            f"CDEF:sfree_{j}=free_{j},UN,PREV,free_{j},IF",
+            f"CDEF:stotal_{j}=total_{j},UN,PREV,total_{j},IF",
+            f"CDEF:used_{j}=stotal_{j},sfree_{j},-",
+            f"{line}:sfree_{j}#{color}:Free {i}"
         )
         if length == 1:
             new_arglist = new_arglist + (
                 f"STACK:used_{j}#FF0000:Used {i}",
-                f"LINE1:total_{j}#000000:Total {i}",
+                f"LINE1:stotal_{j}#000000:Total {i}",
             )
         arglist = arglist + new_arglist
         j = j + 1
