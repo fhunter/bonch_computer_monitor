@@ -4,7 +4,7 @@ import os
 from functools import lru_cache
 import rrdtool
 from period import period_conv
-from tpl_utils import get_graph_title
+from tpl_utils import get_graph_title, getcolor
 import rrd
 
 
@@ -12,15 +12,17 @@ import rrd
 def graph1(hostname, period):
     """Produce graph for cpu load data, over specified period. Period can be d/w/m/y"""
     title, hostname = get_graph_title(hostname)
-    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Load {title}")
+    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Load {title} % (сумма по ядрам)")
     j = 1
+    length = len(hostname)
     for i in hostname:
         if not exists(i):
             continue
+        color = getcolor(j - 1, length)
         new_arglist = (
             f"DEF:load_{j}=rrds/{i}_cpu.rrd:load:MAX",
             f"CDEF:load100_{j}=load_{j},100,/",
-            f"LINE2:load_{j}#0000FF:load {i}",
+            f"LINE2:load_{j}#{color}:load {i}",
         )
         arglist = arglist + new_arglist
         j = j + 1
@@ -37,14 +39,16 @@ def graph1(hostname, period):
 def graph2(hostname, period):
     """Produce graph for number of cores, over specified period. Period can be d/w/m/y"""
     title, hostname = get_graph_title(hostname)
-    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Load {title}")
+    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Количество ядер процессора: {title}")
     j = 1
+    length = len(hostname)
     for i in hostname:
         if not exists(i):
             continue
+        color = getcolor(j - 1, length)
         new_arglist = (
             f"DEF:cores_{j}=rrds/{i}_cpu.rrd:cores:LAST",
-            f"LINE2:cores_{j}#00FFFF:cores {i}",
+            f"LINE2:cores_{j}#{color}:cores {i}",
         )
         arglist = arglist + new_arglist
         j = j + 1
@@ -61,14 +65,16 @@ def graph2(hostname, period):
 def graph3(hostname, period):
     """Produce graph for load average, over specified period. Period can be d/w/m/y"""
     title, hostname = get_graph_title(hostname)
-    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Load {title}")
+    arglist = ("-", "--start", period_conv(period), "-w 800", f"--title=Loadavg {title} - среднее количество процессов ожидающих исполнения")
     j = 1
+    length = len(hostname)
     for i in hostname:
         if not exists(i):
             continue
+        color = getcolor(j - 1, length)
         new_arglist = (
             f"DEF:loadavg_{j}=rrds/{i}_cpu.rrd:loadavg:LAST",
-            f"LINE2:loadavg_{j}#FF00FF:loadavg {i}",
+            f"LINE2:loadavg_{j}#{color}:loadavg {i}",
         )
         arglist = arglist + new_arglist
         j = j + 1
