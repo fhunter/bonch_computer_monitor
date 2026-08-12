@@ -1,6 +1,6 @@
-%include header
+%include('header')
 <h1>Поиск пользовательских сессий</h1>
-%include menu
+%include('menu')
 %import datetime
 %import settings
 %import tpl_utils
@@ -45,4 +45,4 @@
 </table>
 %end
 
-%include footer
+%include('footer')

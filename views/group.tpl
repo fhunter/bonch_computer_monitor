@@ -1,8 +1,8 @@
-%include header
+%include('header')
 %import settings
 %import tpl_utils
 <h1>Графики для группы {{attr}}</h1>
-%include graph_menu path="group/" + attr, period=period
+%include('graph_menu', path="group/" + attr, period=period)
 
 <h2>Нагрузка на процессор</h2>
 <img src="{{settings.PREFIX}}/graph/g/{{attr}}_cpu1/{{period}}"><br/>
@@ -53,4 +53,4 @@
 %end
 </tr>
 </table>
-%include footer
+%include('footer')

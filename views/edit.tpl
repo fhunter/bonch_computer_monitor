@@ -1,4 +1,4 @@
-%include header
+%include('header')
 %import settings
 %import tpl_utils
 <table border=1>
@@ -43,4 +43,4 @@
 </table>
 <hr/>
 <a href="{{settings.PREFIX}}/"><button>Назад</button></a>
-%include footer
+%include('footer')

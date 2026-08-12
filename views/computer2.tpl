@@ -1,5 +1,5 @@
 <h1>Статус {{machine}}</h1>
-%include menu
+%include('menu')
 %import calendar
 %import datetime
 %import usage
@@ -28,4 +28,4 @@
 <h2>Статус ansible</h2>
 <img src={{settings.PREFIX}}/graph/{{machine}}_ansible/{{period}}>
 
-%include footer
+%include('footer')
