@@ -68,7 +68,7 @@ def is_ansible_ok(ansible, last_report, repodate=None):
         days=1
     )
     if from_last_report >= 60:
-        result = "Где компьютер?"
+        result = "🖥️❔"
     else:
         if ansible:
             delta = last_report - datetime.datetime.fromtimestamp(ansible[0])
@@ -81,9 +81,9 @@ def is_ansible_ok(ansible, last_report, repodate=None):
                 else:
                     result = "⌛"
             if delta >= 12:
-                result = "Нет данных"
+                result = "❔"
             if int(ansible[4]) > 0:
-                result = "Ошибка!"
+                result = "❌"
     return result
 
 
