@@ -6,7 +6,8 @@ import colorsys
 
 def getcolor(num, number):
     """produce spaced color on color wheel our of number colors"""
-    t = colorsys.hsv_to_rgb(num / number, 1, 1)
+#    t = colorsys.hsv_to_rgb(num / number, 1, 1)
+    t = colorsys.hsv_to_rgb((num * 0.618033988749895) % 1.0, 0.7, 0.95)
     t = [int(x * 255) for x in t]
     t = [f"{x:02x}" for x in t]
     return "".join(t)
